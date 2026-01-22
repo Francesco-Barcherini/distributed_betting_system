@@ -28,22 +28,64 @@ function loadAdminBets() {
         const status = bet.status || 'open';
         const result = bet.result || '-';
         
-        row.innerHTML = `
-            <td>${bet.id}</td>
-            <td><span class="category-badge ${bet.category}">${bet.category}</span></td>
-            <td>${bet.title}</td>
-            <td><span class="status-badge ${status}">${status}</span></td>
-            <td>${result}</td>
-            <td class="actions-cell">
-                ${status === 'open' ? `
-                    <button class="btn-small btn-warning" onclick="stopBetting(${bet.id})">Stop Betting</button>
-                ` : ``}
-                <button class="btn-small btn-primary" onclick="openResultModal(${bet.id})">Set Result</button>
-                ${status === 'closed' ? `
-                    <button class="btn-small" onclick="reopenBetting(${bet.id})">Reopen</button>
-                ` : ``}
-            </td>
-        `;
+        // ID cell
+        const idCell = document.createElement('td');
+        idCell.textContent = bet.id;
+        
+        // Category cell
+        const categoryCell = document.createElement('td');
+        const categoryBadge = document.createElement('span');
+        categoryBadge.className = `category-badge ${bet.category}`;
+        categoryBadge.textContent = bet.category;
+        categoryCell.appendChild(categoryBadge);
+        
+        // Title cell
+        const titleCell = document.createElement('td');
+        titleCell.textContent = bet.title;
+        
+        // Status cell
+        const statusCell = document.createElement('td');
+        const statusBadge = document.createElement('span');
+        statusBadge.className = `status-badge ${status}`;
+        statusBadge.textContent = status;
+        statusCell.appendChild(statusBadge);
+        
+        // Result cell
+        const resultCell = document.createElement('td');
+        resultCell.textContent = result;
+        
+        // Actions cell
+        const actionsCell = document.createElement('td');
+        actionsCell.className = 'actions-cell';
+        
+        if (status === 'open') {
+            const stopBtn = document.createElement('button');
+            stopBtn.className = 'btn-small btn-warning';
+            stopBtn.textContent = 'Stop Betting';
+            stopBtn.onclick = () => stopBetting(bet.id);
+            actionsCell.appendChild(stopBtn);
+        }
+        
+        const resultBtn = document.createElement('button');
+        resultBtn.className = 'btn-small btn-primary';
+        resultBtn.textContent = 'Set Result';
+        resultBtn.onclick = () => openResultModal(bet.id);
+        actionsCell.appendChild(resultBtn);
+        
+        if (status === 'closed') {
+            const reopenBtn = document.createElement('button');
+            reopenBtn.className = 'btn-small';
+            reopenBtn.textContent = 'Reopen';
+            reopenBtn.onclick = () => reopenBetting(bet.id);
+            actionsCell.appendChild(reopenBtn);
+        }
+        
+        row.appendChild(idCell);
+        row.appendChild(categoryCell);
+        row.appendChild(titleCell);
+        row.appendChild(statusCell);
+        row.appendChild(resultCell);
+        row.appendChild(actionsCell);
         
         tbody.appendChild(row);
     });
@@ -141,7 +183,7 @@ function openResultModal(betId) {
     const resultOptions = document.getElementById('result-options');
     resultOptions.innerHTML = '';
     
-    bet.outcomes.forEach((outcome, index) => {
+    bet.outcomes.forEach((outcome) => {
         const btn = document.createElement('button');
         btn.className = 'btn btn-large result-option-btn';
         btn.textContent = outcome.label;

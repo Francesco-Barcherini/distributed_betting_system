@@ -39,24 +39,58 @@ function createBetCard(bet) {
     card.className = 'bet-card';
     card.onclick = () => viewBetDetail(bet.id);
     
-    card.innerHTML = `
-        <div class="bet-card-header">
-            <div class="bet-category">${bet.category}</div>
-            <h3>${bet.title}</h3>
-        </div>
-        <div class="bet-outcomes">
-            ${bet.outcomes.slice(0, 2).map(outcome => `
-                <div class="outcome">
-                    <span class="outcome-label">${outcome.label}</span>
-                    <span class="outcome-odds">${outcome.odds}x</span>
-                </div>
-            `).join('')}
-        </div>
-        <div class="bet-info">
-            <span>Volume: ${bet.volume}</span>
-            <span>${bet.participants} participants</span>
-        </div>
-    `;
+    // Create card header
+    const header = document.createElement('div');
+    header.className = 'bet-card-header';
+    
+    const categoryBadge = document.createElement('div');
+    categoryBadge.className = 'bet-category';
+    categoryBadge.textContent = bet.category;
+    
+    const title = document.createElement('h3');
+    title.textContent = bet.title;
+    
+    header.appendChild(categoryBadge);
+    header.appendChild(title);
+    
+    // Create outcomes
+    const outcomesDiv = document.createElement('div');
+    outcomesDiv.className = 'bet-outcomes';
+    
+    bet.outcomes.slice(0, 2).forEach(outcome => {
+        const outcomeDiv = document.createElement('div');
+        outcomeDiv.className = 'outcome';
+        
+        const label = document.createElement('span');
+        label.className = 'outcome-label';
+        label.textContent = outcome.label;
+        
+        const odds = document.createElement('span');
+        odds.className = 'outcome-odds';
+        odds.textContent = `${outcome.odds}x`;
+        
+        outcomeDiv.appendChild(label);
+        outcomeDiv.appendChild(odds);
+        outcomesDiv.appendChild(outcomeDiv);
+    });
+    
+    // Create info
+    const info = document.createElement('div');
+    info.className = 'bet-info';
+    
+    const volume = document.createElement('span');
+    volume.textContent = `Volume: ${bet.volume}`;
+    
+    const participants = document.createElement('span');
+    participants.textContent = `${bet.participants} participants`;
+    
+    info.appendChild(volume);
+    info.appendChild(participants);
+    
+    // Assemble card
+    card.appendChild(header);
+    card.appendChild(outcomesDiv);
+    card.appendChild(info);
     
     return card;
 }

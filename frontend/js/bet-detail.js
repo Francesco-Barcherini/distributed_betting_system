@@ -62,10 +62,17 @@ function loadBetDetail(betId) {
         const btn = document.createElement('div');
         btn.className = 'outcome-btn';
         btn.onclick = () => selectOutcome(index);
-        btn.innerHTML = `
-            <span class="outcome-btn-label">${outcome.label}</span>
-            <span class="outcome-btn-odds">${outcome.odds}x</span>
-        `;
+        
+        const label = document.createElement('span');
+        label.className = 'outcome-btn-label';
+        label.textContent = outcome.label;
+        
+        const odds = document.createElement('span');
+        odds.className = 'outcome-btn-odds';
+        odds.textContent = `${outcome.odds}x`;
+        
+        btn.appendChild(label);
+        btn.appendChild(odds);
         outcomesContainer.appendChild(btn);
     });
     
@@ -150,12 +157,22 @@ function loadActivity() {
     mockActivity.forEach(activity => {
         const item = document.createElement('div');
         item.className = 'activity-item';
-        item.innerHTML = `
-            <div class="activity-header">
-                <span class="activity-details">${activity.action}</span>
-                <span class="activity-time">${activity.time}</span>
-            </div>
-        `;
+        
+        const header = document.createElement('div');
+        header.className = 'activity-header';
+        
+        const details = document.createElement('span');
+        details.className = 'activity-details';
+        details.textContent = activity.action;
+        
+        const time = document.createElement('span');
+        time.className = 'activity-time';
+        time.textContent = activity.time;
+        
+        header.appendChild(details);
+        header.appendChild(time);
+        item.appendChild(header);
+        
         activityList.appendChild(item);
     });
 }
