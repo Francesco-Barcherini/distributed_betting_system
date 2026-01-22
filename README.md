@@ -20,25 +20,21 @@ graph TD
     WS[WebServer]
     SPAWN[SpawnService]
 
-    %% ===== Livello 2/3: Game Cluster =====
+    %% ===== Livello 3: Game Cluster =====
     subgraph GAME_CLUSTER[GameServiceCluster]
         direction TB
         NODE1[GameNode1]
-        NODE2[GameNode2]
     end
 
     %% ===== Livello 3: Database =====
     SQL[MySQL]
 
     %% ===== Collegamenti =====
-    LB -->|HTTP/REST| WS
-    LB -->|Game Traffic| SPAWN
-    LB -->|Direct Game Traffic| NODE1
-    LB -->|Direct Game Traffic| NODE2
-    SPAWN --> NODE1
-    SPAWN --> NODE2
+    LB --> WS
+    LB --> SPAWN
+    LB --> GAME_CLUSTER
+    SPAWN --> GAME_CLUSTER
     WS --> SQL
-
 ```
 
 
