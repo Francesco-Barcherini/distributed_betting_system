@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BetMarket - Bet Details</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/bet-detail.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">BetMarket</div>
+            <div class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="admin.html" id="admin-link" style="display: none;">Admin</a>
+                <a href="#" onclick="logout()">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Bet Detail Page -->
+    <div class="container">
+        <button class="btn-back" onclick="window.location.href='dashboard.html'">← Back to Markets</button>
+        
+        <div class="bet-detail-container">
+            <div class="bet-detail-header">
+                <div class="bet-category" id="detail-category"></div>
+                <h1 id="detail-title"></h1>
+            </div>
+
+            <div class="bet-stats">
+                <div class="stat-card">
+                    <div class="stat-label">Total Volume</div>
+                    <div class="stat-value" id="detail-volume"></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Participants</div>
+                    <div class="stat-value" id="detail-participants"></div>
+                </div>
+            </div>
+
+            <!-- Spinning Wheel (Virtual Events Only) -->
+            <div class="spinning-wheel-section" id="spinning-wheel-section" style="display: none;">
+                <h2>Spinning Wheel</h2>
+                <div class="wheel-container">
+                    <canvas id="wheel-canvas" width="400" height="400"></canvas>
+                    <div class="wheel-pointer"></div>
+                </div>
+                <div class="test-buttons">
+                    <button class="btn btn-primary" onclick="testSpin('red')">Test - Stop on Red</button>
+                    <button class="btn btn-primary" onclick="testSpin('black')">Test - Stop on Black</button>
+                </div>
+            </div>
+
+            <div class="betting-section">
+                <h2>Place Your Bet</h2>
+                <div class="outcome-options" id="outcome-options">
+                    <!-- Outcome buttons will be dynamically loaded -->
+                </div>
+
+                <div class="bet-form">
+                    <div class="form-group">
+                        <label>Amount ($)</label>
+                        <input type="number" id="bet-amount" placeholder="Enter amount" min="1" step="0.01">
+                    </div>
+                    <div class="potential-return">
+                        <span>Potential Return:</span>
+                        <span id="potential-return">$0.00</span>
+                    </div>
+                    <button class="btn btn-primary btn-large" onclick="placeBet()">Place Bet</button>
+                </div>
+            </div>
+
+            <div class="market-activity">
+                <h3>Recent Activity</h3>
+                <div class="activity-list" id="activity-list">
+                    <!-- Activity items will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/bet-detail.js"></script>
+</body>
+</html>

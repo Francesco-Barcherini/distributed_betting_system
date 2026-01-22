@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BetMarket - Dashboard</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">BetMarket</div>
+            <div class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="admin.html" id="admin-link" style="display: none;">Admin</a>
+                <a href="#" onclick="logout()">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Page -->
+    <div class="container">
+        <div class="dashboard-header">
+            <h1>Active Markets</h1>
+            <div class="balance-card">
+                <span class="balance-label">Balance:</span>
+                <span class="balance-amount">$1,000.00</span>
+            </div>
+        </div>
+
+        <div class="filters">
+            <button class="filter-btn active" onclick="filterBets('all')">All</button>
+            <button class="filter-btn" onclick="filterBets('real')">Real</button>
+            <button class="filter-btn" onclick="filterBets('virtual')">Virtual</button>
+        </div>
+
+        <div class="bets-grid" id="bets-grid">
+            <!-- Bets will be dynamically loaded here -->
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

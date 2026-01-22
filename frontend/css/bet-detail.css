@@ -1,0 +1,228 @@
+/* Bet Detail Page */
+.bet-detail-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.bet-detail-header {
+    margin-bottom: 2rem;
+}
+
+.bet-detail-header h1 {
+    font-size: 2rem;
+    margin: 1rem 0;
+}
+
+.bet-detail-header p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+.bet-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--bg-card);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+}
+
+.stat-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.betting-section {
+    background: var(--bg-card);
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin-bottom: 2rem;
+}
+
+.betting-section h2 {
+    margin-bottom: 1.5rem;
+}
+
+.outcome-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.outcome-btn {
+    padding: 1rem;
+    background: var(--bg-dark);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.outcome-btn:hover {
+    border-color: var(--primary);
+}
+
+.outcome-btn.selected {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+.outcome-btn-label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+}
+
+.outcome-btn-odds {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.outcome-btn.selected .outcome-btn-label,
+.outcome-btn.selected .outcome-btn-odds {
+    color: white;
+}
+
+.potential-return {
+    display: flex;
+    justify-content: space-between;
+    margin: 1rem 0;
+    padding: 1rem;
+    background: var(--bg-dark);
+    border-radius: 8px;
+    font-size: 1.1rem;
+}
+
+.potential-return span:last-child {
+    font-weight: 600;
+    color: var(--success);
+}
+
+/* Market Activity */
+.market-activity {
+    background: var(--bg-card);
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+}
+
+.market-activity h3 {
+    margin-bottom: 1rem;
+}
+
+.activity-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.activity-item {
+    padding: 1rem;
+    background: var(--bg-dark);
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+}
+
+.activity-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.activity-user {
+    font-weight: 500;
+}
+
+.activity-time {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.activity-details {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Spinning Wheel */
+.spinning-wheel-section {
+    background: var(--bg-card);
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin-bottom: 2rem;
+}
+
+.spinning-wheel-section h2 {
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.wheel-container {
+    position: relative;
+    width: 400px;
+    height: 400px;
+    margin: 0 auto 2rem;
+}
+
+#wheel-canvas {
+    display: block;
+    margin: 0 auto;
+}
+
+.wheel-pointer {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-top: 30px solid #fbbf24;
+    z-index: 10;
+}
+
+.test-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.test-buttons .btn {
+    width: auto;
+    padding: 0.75rem 2rem;
+}
+
+@media (max-width: 768px) {
+    .wheel-container {
+        width: 300px;
+        height: 300px;
+    }
+    
+    #wheel-canvas {
+        width: 300px !important;
+        height: 300px !important;
+    }
+    
+    .test-buttons {
+        flex-direction: column;
+    }
+    
+    .test-buttons .btn {
+        width: 100%;
+    }
+}

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BetMarket - Admin Panel</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">BetMarket Admin</div>
+            <div class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="admin.html">Admin Panel</a>
+                <a href="#" onclick="logout()">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Admin Panel -->
+    <div class="container">
+        <h1>Admin Panel</h1>
+
+        <!-- Create New Bet Section -->
+        <div class="admin-section">
+            <h2>Create New Bet</h2>
+            <form id="create-bet-form" class="admin-form" onsubmit="createBet(event)">
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="bet-category" required>
+                        <option value="real">Real</option>
+                        <option value="virtual">Virtual</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Bet Title</label>
+                    <input type="text" id="bet-title" placeholder="Enter bet title" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Option 1 (e.g., Yes)</label>
+                        <input type="text" id="bet-option1" placeholder="Option 1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Option 2 (e.g., No)</label>
+                        <input type="text" id="bet-option2" placeholder="Option 2" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Initial Bets for Option 1 ($)</label>
+                        <input type="number" id="bet-initial1" placeholder="1000" step="1" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Initial Bets for Option 2 ($)</label>
+                        <input type="number" id="bet-initial2" placeholder="1000" step="1" min="0" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Create Bet</button>
+            </form>
+        </div>
+
+        <!-- Manage Existing Bets Section -->
+        <div class="admin-section">
+            <h2>Manage Existing Bets</h2>
+            <div class="bets-table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Category</th>
+                            <th>Title</th>
+                            <th>Status</th>
+                            <th>Result</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-bets-list">
+                        <!-- Bets will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Modal -->
+    <div id="result-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Set Result for Bet</h2>
+                <button class="modal-close" onclick="closeResultModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="modal-bet-title"></p>
+                <div class="result-options" id="result-options">
+                    <!-- Result buttons will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>
