@@ -24,10 +24,16 @@ echo "Jar: $JAR"
 echo "== Copy jar to server =="
 sshpass -p "$ROOT_PASSWORD" scp $SSH_OPTS "$JAR" "root@${WEB_SERVER_IP}:${SPRING_REMOTE_JAR}"
 
-echo "== Restart service =="
+echo "== Restart JAVA =="
 sshpass -p "$ROOT_PASSWORD" ssh $SSH_OPTS "root@${WEB_SERVER_IP}" "\
-  systemctl restart ${SPRING_SERVICE} && \
-  systemctl --no-pager status ${SPRING_SERVICE} | head -n 25 \
+  set -e; \
+  mkdir -p \"$(dirname "${SPRING_REMOTE_JAR}")\"; \
+  pgrep -f \"java.*${SPRING_REMOTE_JAR}\" >/dev/null 2>&1 && pkill -f \"java.*${SPRING_REMOTE_JAR}\" || true; \
+  nohup /usr/bin/java -jar \"${SPRING_REMOTE_JAR}\" > /var/log/${SPRING_SERVICE}.log 2>&1 & \
+  sleep 1; \
+  pgrep -f \"java.*${SPRING_REMOTE_JAR}\" >/dev/null; \
+  echo \"OK: started\"; \
+  tail -n 25 /var/log/${SPRING_SERVICE}.log || true \
 "
 
 echo "✅ Spring deployed"
