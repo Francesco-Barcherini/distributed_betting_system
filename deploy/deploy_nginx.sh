@@ -24,9 +24,38 @@ sshpass -p "$ROOT_PASSWORD" ssh $SSH_OPTS "root@${LOAD_BALANCER_IP}" "\
   fi
 "
 
-echo "== Test and restart nginx =="
-sshpass -p "$ROOT_PASSWORD" ssh $SSH_OPTS "root@${LOAD_BALANCER_IP}" "\
-  nginx -t && systemctl restart nginx && systemctl --no-pager status nginx | head -n 25 \
-"
+echo "== Stop nginx if running, test config, then start =="
+sshpass -p "$ROOT_PASSWORD" ssh $SSH_OPTS "root@${LOAD_BALANCER_IP}" 'bash -s' <<'REMOTE'
+set -euo pipefail
+
+stop_nginx() {
+  if command -v systemctl >/dev/null 2>&1 && systemctl list-unit-files | grep -q '^nginx\.service'; then
+    systemctl is-active --quiet nginx && systemctl stop nginx || true
+  else
+    pgrep -x nginx >/dev/null 2>&1 && (nginx -s quit || pkill -x nginx || true) || true
+  fi
+}
+
+start_nginx() {
+  if command -v systemctl >/dev/null 2>&1 && systemctl list-unit-files | grep -q '^nginx\.service'; then
+    systemctl start nginx
+    systemctl --no-pager status nginx | head -n 25 || true
+  else
+    nginx
+    pgrep -x nginx >/dev/null 2>&1
+  fi
+}
+
+echo "Stopping nginx (if running)..."
+stop_nginx
+
+echo "Testing config..."
+nginx -t
+
+echo "Starting nginx..."
+start_nginx
+
+echo "OK"
+REMOTE
 
 echo "✅ Nginx deployed"
