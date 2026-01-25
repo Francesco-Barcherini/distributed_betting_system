@@ -2,12 +2,15 @@
 set -euo pipefail
 source deploy/config.conf
 
-# Auto-set JAVA_HOME if missing (Debian/Ubuntu)
-if [[ -z "${JAVA_HOME:-}" ]]; then
-  JAVA_HOME="$(dirname "$(dirname "$(readlink -f "$(which javac)")")")"
-  export JAVA_HOME
-  export PATH="$JAVA_HOME/bin:$PATH"
+# ensure JAVA_HOME is valid/accessible and java is on PATH
+if [ -n "${JAVA_HOME:-}" ] && [ ! -x "$JAVA_HOME/bin/java" ]; then
+  echo "WARN: JAVA_HOME is set but not usable: $JAVA_HOME (falling back to system java)" >&2
+  unset JAVA_HOME
 fi
+if [ -z "${JAVA_HOME:-}" ]; then
+  export JAVA_HOME="$(dirname "$(dirname "$(readlink -f "$(command -v java)")")")"
+fi
+export PATH="$JAVA_HOME/bin:$PATH"
 
 ROOT_PASSWORD="${ROOT_PASSWORD:?missing ROOT_PASSWORD}"
 SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
@@ -28,4 +31,3 @@ sshpass -p "$ROOT_PASSWORD" ssh $SSH_OPTS "root@${WEB_SERVER_IP}" "\
 "
 
 echo "✅ Spring deployed"
-
