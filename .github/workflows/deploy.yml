@@ -1,0 +1,42 @@
+name: Deploy Spring + Nginx
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_spring:
+        description: "Deploy Spring application"
+        type: boolean
+        default: true
+      deploy_nginx:
+        description: "Deploy Nginx config"
+        type: boolean
+        default: true
+
+  push:
+    branches: [ main, master ]
+    paths:
+      - spring/**
+      - nginx/**
+      - deploy/**
+      - .github/workflows/deploy.yml
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy Nginx
+        if: ${{ github.event_name == 'push' || inputs.deploy_nginx }}
+        env:
+          ROOT_PASSWORD: ${{ secrets.ROOT_PASSWORD }}
+        run: |
+          bash deploy/deploy_nginx.sh
+
+      - name: Deploy Spring
+        if: ${{ github.event_name == 'push' || inputs.deploy_spring }}
+        env:
+          ROOT_PASSWORD: ${{ secrets.ROOT_PASSWORD }}
+        run: |
+          bash deploy/deploy_spring.sh
