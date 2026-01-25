@@ -2,6 +2,13 @@
 set -euo pipefail
 source deploy/config.conf
 
+# Auto-set JAVA_HOME if missing (Debian/Ubuntu)
+if [[ -z "${JAVA_HOME:-}" ]]; then
+  JAVA_HOME="$(dirname "$(dirname "$(readlink -f "$(which javac)")")")"
+  export JAVA_HOME
+  export PATH="$JAVA_HOME/bin:$PATH"
+fi
+
 ROOT_PASSWORD="${ROOT_PASSWORD:?missing ROOT_PASSWORD}"
 SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 
