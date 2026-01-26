@@ -5,6 +5,7 @@ source deploy/config.conf
 # Deployment script for Erlang betting nodes
 # Usage: ./deploy_erlang.sh <node_number>
 # Example: ./deploy_erlang.sh 1
+# Assumes git repository is cloned at ~/distributed_betting_system on each node
 
 ERLANG_PASSWORD="${ERLANG_PASSWORD:?missing ERLANG_PASSWORD}"
 JWT_SECRET="${JWT_SECRET:?missing JWT_SECRET}"
@@ -40,19 +41,18 @@ esac
 
 echo "== Deploying Erlang Node $NODE_NUM ($NODE_NAME) to $NODE_IP =="
 
-# Sync erlang directory to remote (excluding secrets.config)
-echo "== Syncing erlang code to $NODE_IP =="
-sshpass -p "$ERLANG_PASSWORD" ssh $SSH_OPTS "${ERLANG_USER}@${NODE_IP}" "mkdir -p ~/distributed_betting_system"
-sshpass -p "$ERLANG_PASSWORD" rsync -avz --delete --exclude='secrets.config' -e "ssh $SSH_OPTS" \
-    erlang/ "${ERLANG_USER}@${NODE_IP}:~/distributed_betting_system/erlang/"
-
 # Deploy on remote node
-echo "== Installing dependencies and compiling on $NODE_IP =="
 sshpass -p "$ERLANG_PASSWORD" ssh $SSH_OPTS "${ERLANG_USER}@${NODE_IP}" \
     "NODE_NAME='${NODE_NAME}' JWT_SECRET='${JWT_SECRET}' bash -s" <<'REMOTE'
 set -euo pipefail
 
-cd ~/distributed_betting_system/erlang
+cd ~/distributed_betting_system
+
+# Pull latest code
+echo "Pulling latest code..."
+git pull origin main
+
+cd erlang
 
 # Install Erlang if needed
 if ! command -v erl &> /dev/null; then
