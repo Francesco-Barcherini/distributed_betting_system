@@ -54,20 +54,6 @@ git pull origin main
 
 cd erlang
 
-# Install Erlang if needed
-if ! command -v erl &> /dev/null; then
-    echo "Installing Erlang..."
-    sudo apt-get update
-    sudo apt-get install -y erlang
-fi
-
-# Install rebar3 if needed
-if ! command -v rebar3 &> /dev/null; then
-    echo "Installing rebar3..."
-    sudo apt-get update
-    sudo apt-get install -y rebar3
-fi
-
 echo "Compiling application..."
 rebar3 compile
 
