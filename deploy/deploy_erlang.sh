@@ -1,14 +1,15 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
+source deploy/config.conf
 
 # Deployment script for Erlang betting nodes
 # Usage: ./deploy_erlang.sh <node_number>
 # Example: ./deploy_erlang.sh 1
 
-set -e
-
-# Load configuration
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "${SCRIPT_DIR}/config.conf"
+ERLANG_PASSWORD="${ERLANG_PASSWORD:?missing ERLANG_PASSWORD}"
+JWT_SECRET="${JWT_SECRET:?missing JWT_SECRET}"
+SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+ERLANG_USER="dsmt"
 
 NODE_NUM=$1
 
@@ -37,77 +38,66 @@ case $NODE_NUM in
         ;;
 esac
 
-echo "Deploying to Node $NODE_NUM at $NODE_IP..."
+echo "== Deploying Erlang Node $NODE_NUM ($NODE_NAME) to $NODE_IP =="
+
+# Sync erlang directory to remote (excluding secrets.config)
+echo "== Syncing erlang code to $NODE_IP =="
+sshpass -p "$ERLANG_PASSWORD" ssh $SSH_OPTS "${ERLANG_USER}@${NODE_IP}" "mkdir -p ~/distributed_betting_system"
+sshpass -p "$ERLANG_PASSWORD" rsync -avz --delete --exclude='secrets.config' -e "ssh $SSH_OPTS" \
+    erlang/ "${ERLANG_USER}@${NODE_IP}:~/distributed_betting_system/erlang/"
 
 # Deploy on remote node
-echo "Deploying on remote node..."
-ssh "root@${NODE_IP}" << EOF
-    set -e
-    
-    # Ensure application directory exists
-    mkdir -p /opt/betting_system
-    cd /opt/betting_system
-    
-    # Ensure code is pulled (user assumes git repo already cloned)
-    if [ -d .git ]; then
-        echo "Pulling latest code..."
-        git pull origin main
-    else
-        echo "Git repository not found. Ensure code is already cloned at /opt/betting_system"
-        exit 1
-    fi
-    
-    # Install Erlang if needed
-    if ! command -v erl &> /dev/null; then
-        echo "Installing Erlang..."
-        apt-get update
-        apt-get install -y erlang
-    fi
-    
-    # Install rebar3 if needed
-    if ! command -v rebar3 &> /dev/null; then
-        echo "Installing rebar3..."
-        apt-get update
-        apt-get install -y rebar3
-    fi
-    
-    # Navigate to erlang directory and compile
-    cd erlang
-    echo "Compiling application..."
-    rebar3 compile
-    
-    echo "Application compiled successfully"
-EOF
+echo "== Installing dependencies and compiling on $NODE_IP =="
+sshpass -p "$ERLANG_PASSWORD" ssh $SSH_OPTS "${ERLANG_USER}@${NODE_IP}" \
+    "NODE_NAME='${NODE_NAME}' JWT_SECRET='${JWT_SECRET}' bash -s" <<'REMOTE'
+set -euo pipefail
 
-echo ""
-echo "Deployment to Node $NODE_NUM completed!"
-echo ""
-echo "Next steps:"
-if [ "$NODE_NUM" == "1" ]; then
-    echo "  1. SSH to $NODE_IP:"
-    echo "     ssh root@${NODE_IP}"
-    echo ""
-    echo "  2. Start the master node (Node 1 must start first):"
-    echo "     cd /opt/betting_system/erlang"
-    echo "     erl -sname ${NODE_NAME} -setcookie betting_cookie \\"
-    echo "         -pa _build/default/lib/*/ebin \\"
-    echo "         -config sys.config \\"
-    echo "         -eval \"application:start(betting_node)\""
-    echo ""
-    echo "  3. After Node 1 is running, deploy and start Nodes 2 and 3"
-else
-    echo "  1. SSH to $NODE_IP:"
-    echo "     ssh root@${NODE_IP}"
-    echo ""
-    echo "  2. Start this worker node:"
-    echo "     cd /opt/betting_system/erlang"
-    echo "     erl -sname ${NODE_NAME} -setcookie betting_cookie \\"
-    echo "         -pa _build/default/lib/*/ebin \\"
-    echo "         -config sys.config \\"
-    echo "         -eval \"application:start(betting_node)\""
-    echo ""
-    echo "  Note: Make sure Node 1 (10.2.1.62) is running first!"
+cd ~/distributed_betting_system/erlang
+
+# Install Erlang if needed
+if ! command -v erl &> /dev/null; then
+    echo "Installing Erlang..."
+    sudo apt-get update
+    sudo apt-get install -y erlang
 fi
+
+# Install rebar3 if needed
+if ! command -v rebar3 &> /dev/null; then
+    echo "Installing rebar3..."
+    sudo apt-get update
+    sudo apt-get install -y rebar3
+fi
+
+echo "Compiling application..."
+rebar3 compile
+
+# Create a startup script with JWT_SECRET
+cat > start_node.sh << STARTUP
+#!/bin/bash
+export JWT_SECRET='${JWT_SECRET}'
+cd ~/distributed_betting_system/erlang
+erl -sname ${NODE_NAME} -setcookie betting_cookie \\
+    -pa _build/default/lib/*/ebin \\
+    -config sys.config \\
+    "\$@" \\
+    -eval "application:start(betting_node)"
+STARTUP
+chmod +x start_node.sh
+
+echo "Application compiled successfully on $NODE_NAME"
+echo "Startup script created: ~/distributed_betting_system/erlang/start_node.sh"
+REMOTE
+
+echo "✅ Erlang Node $NODE_NUM deployed to $NODE_IP"
 echo ""
-echo "For detached mode (background), add '-detached' to the erl command above"
-echo ""
+echo "To start the node, SSH to $NODE_IP and run:"
+echo "  cd ~/distributed_betting_system/erlang"
+echo "  ./start_node.sh              # foreground mode"
+echo "  ./start_node.sh -detached    # background mode"
+if [ "$NODE_NUM" == "1" ]; then
+    echo ""
+    echo "Note: Node 1 (master) must be started FIRST before other nodes."
+else
+    echo ""
+    echo "Note: Make sure Node 1 ($ERLANG1_IP) is running first!"
+fi

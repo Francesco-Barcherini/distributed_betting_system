@@ -1,4 +1,4 @@
-name: Deploy Spring + Nginx
+name: Deploy Spring + Nginx + Erlang
 
 on:
   workflow_dispatch:
@@ -11,12 +11,17 @@ on:
         description: "Deploy Nginx config"
         type: boolean
         default: true
+      deploy_erlang:
+        description: "Deploy Erlang nodes"
+        type: boolean
+        default: true
 
   push:
     branches: [ main, master ]
     paths:
       - spring/**
       - nginx/**
+      - erlang/**
       - deploy/**
       - .github/workflows/deploy.yml
 
@@ -40,3 +45,27 @@ jobs:
           ROOT_PASSWORD: ${{ secrets.ROOT_PASSWORD }}
         run: |
           bash deploy/deploy_spring.sh
+
+      - name: Deploy Erlang Node 1 (Master)
+        if: ${{ github.event_name == 'push' || inputs.deploy_erlang }}
+        env:
+          ERLANG_PASSWORD: ${{ secrets.ERLANG_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        run: |
+          bash deploy/deploy_erlang.sh 1
+
+      - name: Deploy Erlang Node 2
+        if: ${{ github.event_name == 'push' || inputs.deploy_erlang }}
+        env:
+          ERLANG_PASSWORD: ${{ secrets.ERLANG_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        run: |
+          bash deploy/deploy_erlang.sh 2
+
+      - name: Deploy Erlang Node 3
+        if: ${{ github.event_name == 'push' || inputs.deploy_erlang }}
+        env:
+          ERLANG_PASSWORD: ${{ secrets.ERLANG_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        run: |
+          bash deploy/deploy_erlang.sh 3
