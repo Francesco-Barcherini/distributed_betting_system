@@ -1,11 +1,11 @@
 # TODO
 ## Tasks
-- [] Erlang
-  - [] Tet: User e core
-    - [] come gestisco scommesse concorrenti?
-    - [] come spawnano i processi?
-    - [] Come funziona MnesiaDB?
-  - [] Train: Parte admin
+- [x] Erlang
+  - [x] Tet: User e core
+    - [x] come gestisco scommesse concorrenti?
+    - [x] come spawnano i processi?
+    - [x] Come funziona MnesiaDB?
+  - [x] Tet: Parte admin
 - [x] Tren: Nginx load balancer
   - [] proxy globale per i client (todo after erlang implementation)
 - [] Train: Frontend
@@ -15,7 +15,7 @@
   - [x] Tren: Maven
   - [x] API per login/registrazione
     - [x] Token JWT condivisi con Erlang (to see further with erlang implementation)
-    - [] Protocollo di sicurezza e validazione JWT (todo after erlang implementation)
+    - [x] Protocollo di sicurezza e validazione JWT
 
 ## API endpoints
 - API login/registrazione/logout (user e admin)
