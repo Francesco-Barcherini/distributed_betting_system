@@ -51,12 +51,12 @@ handle_bet_placement(Req0, UserId, State) ->
         
         %% Broadcast bet placed event
         spawn(fun() ->
-            broadcast_dispatcher:broadcast({bet_placed, UserId, ref_to_string(GId), Amount, Choice, BetOdd})
+            broadcast_dispatcher:broadcast({bet_placed, UserId, GId, Amount, Choice, BetOdd})
         end),
         
         {ok, reply_json(Req1, 201, #{
             message => <<"Bet placed successfully">>,
-            bet_id => ref_to_string(BetId),
+            bet_id => BetId,
             new_balance => NewBalance,
             bet_odd => BetOdd,
             new_odd1 => NewOdd1,

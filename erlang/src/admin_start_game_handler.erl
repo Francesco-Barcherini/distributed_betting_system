@@ -83,9 +83,8 @@ finish_game(GameId, Result) ->
         {atomic, {WinnersCount, TotalPaid, BalanceUpdates}} ->
             %% Broadcast game result and balance updates
             spawn(fun() ->
-                GameIdStr = ref_to_string(GameId),
                 ResultBin = result_to_binary(Result),
-                broadcast_dispatcher:broadcast({game_result, GameIdStr, ResultBin, WinnersCount, TotalPaid}),
+                broadcast_dispatcher:broadcast({game_result, GameId, ResultBin, WinnersCount, TotalPaid}),
                 %% Send individual balance updates to winners
                 lists:foreach(fun({UserId, NewBalance}) ->
                     broadcast_dispatcher:broadcast({balance_update, UserId, NewBalance})
@@ -95,11 +94,6 @@ finish_game(GameId, Result) ->
         {aborted, game_not_found} ->
             erlang:error(game_not_found)
     end.
-
-ref_to_string(Ref) when is_reference(Ref) ->
-    list_to_binary(erlang:ref_to_list(Ref));
-ref_to_string(Other) ->
-    Other.
 
 get_winning_bets(GameId, WinningChoice) ->
     mnesia:select(bet, [{#bet{game_id = GameId, choice = WinningChoice, _ = '_'}, [], ['$_']}]).

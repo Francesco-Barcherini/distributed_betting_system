@@ -53,8 +53,7 @@ stop_betting(GameId) ->
         {atomic, ok} ->
             %% Broadcast betting closed to all clients
             spawn(fun() ->
-                GameIdStr = ref_to_string(GameId),
-                broadcast_dispatcher:broadcast({betting_closed, GameIdStr})
+                broadcast_dispatcher:broadcast({betting_closed, GameId})
             end),
             ok;
         {aborted, game_not_found} -> erlang:error(game_not_found)
