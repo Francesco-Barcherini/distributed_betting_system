@@ -23,7 +23,7 @@ public class SecurityConfig {
                                 "/admin.html",
                                 "/dashboard.html",
                                 "/bet-detail.html",
-                                "my-bets.html",
+                                "/my-bets.html",
                                 "/css/**",
                                 "/js/**",
                                 "/api/auth/**",
