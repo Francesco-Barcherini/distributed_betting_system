@@ -43,6 +43,7 @@ jobs:
         if: ${{ github.event_name == 'push' || inputs.deploy_spring }}
         env:
           ROOT_PASSWORD: ${{ secrets.ROOT_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: |
           bash deploy/deploy_spring.sh
 

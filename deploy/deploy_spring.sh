@@ -13,6 +13,7 @@ fi
 export PATH="$JAVA_HOME/bin:$PATH"
 
 ROOT_PASSWORD="${ROOT_PASSWORD:?missing ROOT_PASSWORD}"
+JWT_SECRET="${JWT_SECRET:?missing JWT_SECRET}"
 SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 
 echo "== Build Spring =="
@@ -31,7 +32,7 @@ sshpass -p "$ROOT_PASSWORD" scp $SSH_OPTS "$JAR" "root@${WEB_SERVER_IP}:${SPRING
 
 echo "== Stop & Rerun Spring (container) =="
 sshpass -p "$ROOT_PASSWORD" ssh $SSH_OPTS "root@${WEB_SERVER_IP}" \
-  "SPRING_REMOTE_JAR='${SPRING_REMOTE_JAR}' SPRING_SERVICE='${SPRING_SERVICE}' bash -s" <<'REMOTE'
+  "SPRING_REMOTE_JAR='${SPRING_REMOTE_JAR}' SPRING_SERVICE='${SPRING_SERVICE}' JWT_SECRET='${JWT_SECRET}' bash -s" <<'REMOTE'
 set -euo pipefail
 
 APP_JAR="$SPRING_REMOTE_JAR"
@@ -43,8 +44,8 @@ mkdir -p "$LOG_DIR"
 echo "Stopping app (if running)..."
 pkill -f "java.*${APP_JAR}" || true
 
-echo "Starting app..."
-nohup java -jar "$APP_JAR" > "$LOG" 2>&1 &
+echo "Starting app with JWT_SECRET..."
+nohup java -Dapp.jwt.secret="${JWT_SECRET}" -jar "$APP_JAR" > "$LOG" 2>&1 &
 
 sleep 1
 
