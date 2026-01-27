@@ -10,24 +10,6 @@
     font-size: 2rem;
 }
 
-.balance-card {
-    background: var(--bg-card);
-    padding: 1rem 1.5rem;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-}
-
-.balance-label {
-    color: var(--text-secondary);
-    margin-right: 0.5rem;
-}
-
-.balance-amount {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--success);
-}
-
 /* Filters */
 .filters {
     display: flex;

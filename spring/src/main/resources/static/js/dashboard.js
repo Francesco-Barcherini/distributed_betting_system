@@ -98,8 +98,9 @@ function createBetCard(game) {
     header.className = 'bet-card-header';
     
     const categoryBadge = document.createElement('div');
-    categoryBadge.className = 'bet-category';
-    categoryBadge.textContent = getCategoryFromGame(game);
+    const category = getCategoryFromGame(game);
+    categoryBadge.className = `bet-category ${category}`;
+    categoryBadge.textContent = category;
     
     const title = document.createElement('h3');
     title.textContent = game.question_text;
