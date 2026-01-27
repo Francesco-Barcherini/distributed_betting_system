@@ -1,8 +1,11 @@
 package it.unipi.distributed_betting_system.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class AuthResponse {
     private String token;
     private Long id;
+    @JsonProperty("isAdmin")
     private boolean isAdmin;
     private long expiryTimeEpochSeconds;
 
