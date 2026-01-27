@@ -27,7 +27,8 @@ public class SecurityConfig {
                                 "/css/**",
                                 "/js/**",
                                 "/api/auth/**",
-                                "/health"
+                                "/health",
+                                "/favicon.ico"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
