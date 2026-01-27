@@ -19,6 +19,8 @@ async function fetchGames() {
         });
         
         if (!response.ok) {
+            const erlangNode = response.headers.get('x-erlang-node');
+            console.error(`❌ fetchGames failed [${response.status}] from node: ${erlangNode || 'unknown'}`);
             throw new Error('Failed to fetch games');
         }
         
@@ -38,6 +40,8 @@ async function fetchGameDetail(gameId) {
         });
         
         if (!response.ok) {
+            const erlangNode = response.headers.get('x-erlang-node');
+            console.error(`❌ fetchGameDetail failed [${response.status}] from node: ${erlangNode || 'unknown'}`);
             throw new Error('Failed to fetch game details');
         }
         
@@ -61,6 +65,8 @@ async function submitBetAPI(gameId, amount, choice) {
         });
         
         if (!response.ok) {
+            const erlangNode = response.headers.get('x-erlang-node');
+            console.error(`❌ submitBet failed [${response.status}] from node: ${erlangNode || 'unknown'}`);
             const errorData = await response.json();
             throw new Error(errorData.error || 'Failed to place bet');
         }
@@ -80,6 +86,8 @@ async function fetchBalance() {
         });
         
         if (!response.ok) {
+            const erlangNode = response.headers.get('x-erlang-node');
+            console.error(`❌ fetchBalance failed [${response.status}] from node: ${erlangNode || 'unknown'}`);
             throw new Error('Failed to fetch balance');
         }
         

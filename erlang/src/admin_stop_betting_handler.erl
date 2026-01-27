@@ -69,7 +69,9 @@ string_to_ref(RefStr) when is_binary(RefStr) ->
     erlang:list_to_ref(binary_to_list(RefStr)).
 
 reply_json(Req, Status, Body) ->
+    NodeName = list_to_binary(atom_to_list(node())),
     cowboy_req:reply(Status,
-        #{<<"content-type">> => <<"application/json">>},
+        #{<<"content-type">> => <<"application/json">>,
+          <<"x-erlang-node">> => NodeName},
         jsx:encode(Body),
         Req).

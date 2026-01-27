@@ -102,7 +102,9 @@ result_to_binary(opt2) -> <<"opt2">>;
 result_to_binary(Other) -> Other.
 
 reply_json(Req, Status, Body) ->
+    NodeName = list_to_binary(atom_to_list(node())),
     cowboy_req:reply(Status,
-        #{<<"content-type">> => <<"application/json">>},
+        #{<<"content-type">> => <<"application/json">>,
+          <<"x-erlang-node">> => NodeName},
         jsx:encode(Body),
         Req).
