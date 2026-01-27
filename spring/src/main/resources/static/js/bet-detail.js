@@ -25,9 +25,9 @@ registerWSMessageHandler((data) => {
         userBalance = data.balance;
         updateBalanceDisplay();
     } else if (data.opcode === 'bet_confirmed' && currentGame && data.game_id === currentGame.game_id) {
-        // Show bet confirmation
+        // Show bet confirmation (balance will be updated via balance_update message)
         const choiceText = data.choice === 'opt1' ? currentGame.opt1_text : currentGame.opt2_text;
-        alert(`Bet placed successfully!\n\nAmount: $${data.amount.toFixed(2)}\nOutcome: ${choiceText}\nOdds: ${data.odd.toFixed(2)}x\nNew Balance: $${data.balance.toFixed(2)}`);
+        alert(`Bet placed successfully!\n\nAmount: $${data.amount.toFixed(2)}\nOutcome: ${choiceText}\nOdds: ${data.odd.toFixed(2)}x\nPotential Return: $${(data.amount * data.odd).toFixed(2)}`);
     } else if (data.opcode === 'betting_closed' && currentGame && data.game_id === currentGame.game_id) {
         currentGame.betting_open = false;
         displayGameDetails();

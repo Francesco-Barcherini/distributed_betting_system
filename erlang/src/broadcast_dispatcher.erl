@@ -31,16 +31,22 @@ loop() ->
                 <<"cap_opt2">> => CapOpt2
             }));
         
-        {new_game, GameId, QuestionText, Opt1Text, Opt2Text} ->
+        {new_game, GameId, QuestionText, Opt1Text, Opt2Text, Category} ->
             %% Compute initial odds and caps (with no bets, virtual_init_bet handles it)
             {Odd1, Odd2} = odds_calculator:calculate_odds(0, 0, [], []),
             {CapOpt1, CapOpt2} = odds_calculator:calculate_caps(0, 0, [], []),
+            CategoryBin = case Category of
+                real -> <<"real">>;
+                virtual -> <<"virtual">>;
+                _ -> <<"real">>
+            end,
             broadcast_to_websockets(jsx:encode(#{
                 <<"opcode">> => <<"new_game">>,
                 <<"game_id">> => GameId,
                 <<"question_text">> => QuestionText,
                 <<"opt1_text">> => Opt1Text,
                 <<"opt2_text">> => Opt2Text,
+                <<"category">> => CategoryBin,
                 <<"betting_open">> => true,
                 <<"odd1">> => Odd1,
                 <<"odd2">> => Odd2,
@@ -71,15 +77,19 @@ loop() ->
                 <<"balance">> => NewBalance
             }));
         
-        {bet_placed, UserId, GameId, Amount, Choice, Odd, NewBalance} ->
+        {bet_placed, UserId, GameId, Amount, Choice, Odd} ->
             %% Confirm bet to specific user
+            ChoiceBin = case Choice of
+                opt1 -> <<"opt1">>;
+                opt2 -> <<"opt2">>;
+                _ -> <<"unknown">>
+            end,
             broadcast_to_user(UserId, jsx:encode(#{
                 <<"opcode">> => <<"bet_confirmed">>,
                 <<"game_id">> => GameId,
                 <<"amount">> => Amount,
-                <<"choice">> => Choice,
-                <<"odd">> => Odd,
-                <<"balance">> => NewBalance
+                <<"choice">> => ChoiceBin,
+                <<"odd">> => Odd
             }));
         
         _ ->
@@ -92,6 +102,8 @@ broadcast_to_websockets(Msg) ->
     lists:foreach(fun(RegisteredPid) ->
         case RegisteredPid of
             {ws, Node, Pid} when Node =:= node() ->
+                Pid ! {broadcast, Msg};
+            {ws_user, Node, _UserId, Pid} when Node =:= node() ->
                 Pid ! {broadcast, Msg};
             _ ->
                 ok

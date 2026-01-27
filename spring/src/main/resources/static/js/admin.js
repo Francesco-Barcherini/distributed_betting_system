@@ -100,7 +100,7 @@ async function loadAdminGames() {
             
             if (game.betting_open && !game.result) {
                 const stopBtn = document.createElement('button');
-                stopBtn.className = 'btn-small btn-warning';
+                stopBtn.className = 'btn-small btn-warning btn-primary';
                 stopBtn.textContent = 'Stop Betting';
                 stopBtn.onclick = () => stopBettingForGame(game.game_id);
                 actionsCell.appendChild(stopBtn);
