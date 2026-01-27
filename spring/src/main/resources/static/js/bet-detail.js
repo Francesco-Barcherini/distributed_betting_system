@@ -168,12 +168,30 @@ function displayGameDetails() {
     btn2.appendChild(odds2);
     outcomesContainer.appendChild(btn2);
     
+    // Show/hide bet form based on betting status
+    const betFormGroup = document.querySelector('.bet-form .form-group');
+    const potentialReturnDiv = document.querySelector('.bet-form .potential-return');
+    const isClosed = !currentGame.betting_open || currentGame.result;
+    
+    if (betFormGroup) {
+        betFormGroup.style.display = isClosed ? 'none' : 'block';
+    }
+    if (potentialReturnDiv) {
+        potentialReturnDiv.style.display = isClosed ? 'none' : 'flex';
+    }
+    
     // Disable betting if closed or has result
-    if (!currentGame.betting_open || currentGame.result) {
+    if (isClosed) {
         const placeBetBtn = document.querySelector('button[onclick="placeBet()"]');
         if (placeBetBtn) {
             placeBetBtn.disabled = true;
             placeBetBtn.textContent = currentGame.result ? 'Game Finished' : 'Betting Closed';
+        }
+    } else {
+        const placeBetBtn = document.querySelector('button[onclick="placeBet()"]');
+        if (placeBetBtn) {
+            placeBetBtn.disabled = false;
+            placeBetBtn.textContent = 'Place Bet';
         }
     }
     
