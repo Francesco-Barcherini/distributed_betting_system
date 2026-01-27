@@ -24,7 +24,7 @@ handle_post(Req0, State) ->
         {ok, _AdminId} = jwt_helper:validate_admin_jwt(Req0),
         {ok, Body, Req1} = cowboy_req:read_body(Req0),
 
-        #{<<"game_id">> := GameIdStr, <<"result">> := ResultBin} = jsx:decode(Body, [return_maps]),
+        #{<<"game_id">> := GameIdInt, <<"result">> := ResultBin} = jsx:decode(Body, [return_maps]),
         Result = case ResultBin of
             <<"opt1">> -> opt1;
             <<"opt2">> -> opt2;
