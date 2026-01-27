@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     connectWebSocket();
     
     loadBets();
+    loadBalance();
 });
 
 // Load and display bets
@@ -187,3 +188,21 @@ function filterBets(category) {
 function viewBetDetail(gameId) {
     window.location.href = `bet-detail.html?id=${gameId}`;
 }
+
+// Load user balance
+async function loadBalance() {
+    try {
+        const balance = await fetchBalance();
+        const balanceElement = document.querySelector('.balance-amount');
+        if (balanceElement) {
+            balanceElement.textContent = `$${balance.toFixed(2)}`;
+        }
+    } catch (error) {
+        console.error('Error loading balance:', error);
+        const balanceElement = document.querySelector('.balance-amount');
+        if (balanceElement) {
+            balanceElement.textContent = 'Error';
+        }
+    }
+}
+
