@@ -30,6 +30,25 @@ document.addEventListener('DOMContentLoaded', () => {
     connectWebSocket();
     
     loadAdminGames();
+    
+    // Add category change listener
+    const categorySelect = document.getElementById('bet-category');
+    const opt1Input = document.getElementById('bet-option1');
+    const opt2Input = document.getElementById('bet-option2');
+    
+    categorySelect.addEventListener('change', (e) => {
+        if (e.target.value === 'virtual') {
+            opt1Input.value = 'Red';
+            opt2Input.value = 'Black';
+            opt1Input.readOnly = true;
+            opt2Input.readOnly = true;
+        } else {
+            opt1Input.value = '';
+            opt2Input.value = '';
+            opt1Input.readOnly = false;
+            opt2Input.readOnly = false;
+        }
+    });
 });
 
 // Load games in admin table

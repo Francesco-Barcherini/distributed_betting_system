@@ -32,9 +32,35 @@ registerWSMessageHandler((data) => {
         currentGame.betting_open = false;
         displayGameDetails();
     } else if (data.opcode === 'game_result' && currentGame && data.game_id === currentGame.game_id) {
-        currentGame.result = data.result;
-        currentGame.betting_open = false;
-        displayGameDetails();
+        // Store the result data
+        const resultData = {
+            result: data.result,
+            winners_count: data.winners_count,
+            total_paid: data.total_paid
+        };
+        
+        // If virtual game, spin the wheel first
+        const category = currentGame.category || 'real';
+        if (category === 'virtual') {
+            // Map result to color
+            const resultColor = data.result === 'opt1' ? 'red' : 'black';
+            
+            // Start spinning wheel
+            spinWheelWithCallback(resultColor, () => {
+                // This callback runs after wheel stops spinning
+                currentGame.result = resultData.result;
+                currentGame.betting_open = false;
+                displayGameDetails();
+                
+                // Reload balance after wheel stops
+                loadBalance();
+            });
+        } else {
+            // For real games, update immediately
+            currentGame.result = resultData.result;
+            currentGame.betting_open = false;
+            displayGameDetails();
+        }
     }
 });
 
@@ -348,6 +374,11 @@ function drawWheel() {
 
 // Spin the wheel and stop at specified color
 function spinWheel(stopColor) {
+    spinWheelWithCallback(stopColor, null);
+}
+
+// Spin the wheel with a callback when finished
+function spinWheelWithCallback(stopColor, callback) {
     if (wheelSpinning) return;
     
     console.log('=== SPIN WHEEL DEBUG ===');
@@ -451,10 +482,17 @@ function spinWheel(stopColor) {
             console.log('Expected color:', stopColor.toUpperCase());
             console.log('=== END DEBUG ===');
             
-            // Show result
-            setTimeout(() => {
-                alert(`Wheel stopped on ${colorAtPointer}!\nExpected: ${stopColor.toUpperCase()}`);
-            }, 100);
+            // Execute callback if provided
+            if (callback && typeof callback === 'function') {
+                setTimeout(() => {
+                    callback();
+                }, 500); // Small delay to let user see the result
+            } else {
+                // Show result alert (original behavior for test spins)
+                setTimeout(() => {
+                    alert(`Wheel stopped on ${colorAtPointer}!\nExpected: ${stopColor.toUpperCase()}`);
+                }, 100);
+            }
         }
     }
     
