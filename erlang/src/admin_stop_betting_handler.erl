@@ -21,13 +21,13 @@ handle_post(Req0, State) ->
         {ok, _AdminId} = jwt_helper:validate_admin_jwt(Req0),
         {ok, Body, Req1} = cowboy_req:read_body(Req0),
 
-        #{<<"game_id">> := GameIdStr} = jsx:decode(Body, [return_maps]),
-        GameId = string_to_ref(GameIdStr),
+        #{<<"game_id">> := GameIdInt} = jsx:decode(Body, [return_maps]),
+        GameId = GameIdInt,
 
         ok = stop_betting(GameId),
         Resp = reply_json(Req1, 200, #{
             message => <<"Betting stopped for game">>,
-            game_id => GameIdStr
+            game_id => GameIdInt
         }),
         {ok, Resp, State}
     catch
@@ -59,14 +59,6 @@ stop_betting(GameId) ->
             ok;
         {aborted, game_not_found} -> erlang:error(game_not_found)
     end.
-
-ref_to_string(Ref) when is_reference(Ref) ->
-    list_to_binary(erlang:ref_to_list(Ref));
-ref_to_string(Other) ->
-    Other.
-
-string_to_ref(RefStr) when is_binary(RefStr) ->
-    erlang:list_to_ref(binary_to_list(RefStr)).
 
 reply_json(Req, Status, Body) ->
     NodeName = list_to_binary(atom_to_list(node())),

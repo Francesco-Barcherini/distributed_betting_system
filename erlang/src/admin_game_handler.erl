@@ -29,7 +29,7 @@ handle_post(Req0, State) ->
         GameId = create_game(QuestionText, Opt1Text, Opt2Text),
         Resp = reply_json(Req1, 201, #{
             message => <<"Game created successfully">>,
-            game_id => ref_to_string(GameId)
+            game_id => GameId
         }),
         {ok, Resp, State}
     catch
@@ -38,7 +38,7 @@ handle_post(Req0, State) ->
     end.
 
 create_game(QuestionText, Opt1Text, Opt2Text) ->
-    GameId = make_ref(),
+    GameId = betting_node_mnesia:next_game_id(),
     Game = #game{
         game_id = GameId,
         question_text = QuestionText,
@@ -59,16 +59,10 @@ create_game(QuestionText, Opt1Text, Opt2Text) ->
 
     %% Broadcast new game to all clients
     spawn(fun() ->
-        GameIdStr = ref_to_string(GameId),
-        broadcast_dispatcher:broadcast({new_game, GameIdStr, QuestionText, Opt1Text, Opt2Text})
+        broadcast_dispatcher:broadcast({new_game, GameId, QuestionText, Opt1Text, Opt2Text})
     end),
 
     GameId.
-
-ref_to_string(Ref) when is_reference(Ref) ->
-    list_to_binary(erlang:ref_to_list(Ref));
-ref_to_string(Other) ->
-    Other.
 
 reply_json(Req, Status, Body) ->
     NodeName = list_to_binary(atom_to_list(node())),

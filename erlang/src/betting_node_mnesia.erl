@@ -1,14 +1,19 @@
 -module(betting_node_mnesia).
 
--export([init/0, wait_for_tables/0]).
+-export([init/0, wait_for_tables/0, next_game_id/0, next_bet_id/0]).
 
 -record(account, {
     user_id,        % User ID from JWT
     balance         % Current balance (float)
 }).
 
+-record(counter, {
+    name,           % Counter name (game_id | bet_id)
+    value           % Current value (integer)
+}).
+
 -record(game, {
-    game_id,        % Unique game ID (reference)
+    game_id,        % Unique game ID (integer)
     question_text,  % Question text
     opt1_text,      % Option 1 text
     opt2_text,      % Option 2 text
@@ -20,7 +25,7 @@
 }).
 
 -record(bet, {
-    bet_id,         % Unique bet ID (reference)
+    bet_id,         % Unique bet ID (integer)
     user_id,        % User ID
     game_id,        % Game ID
     amount,         % Bet amount (float)
@@ -167,6 +172,13 @@ wait_for_master(MasterNode, SecondsLeft) ->
 create_tables(Nodes) ->
     io:format("Creating tables with replicas on: ~p~n", [Nodes]),
     
+    %% Create counter table for ID generation
+    mnesia:create_table(counter, [
+        {attributes, record_info(fields, counter)},
+        {disc_copies, Nodes},
+        {type, set}
+    ]),
+    
     %% Create account table
     mnesia:create_table(account, [
         {attributes, record_info(fields, account)},
@@ -194,7 +206,7 @@ create_tables(Nodes) ->
     ok.
 
 wait_for_tables() ->
-    Tables = [account, game, bet],
+    Tables = [counter, account, game, bet],
     io:format("Waiting for tables: ~p~n", [Tables]),
     case mnesia:wait_for_tables(Tables, 30000) of
         ok -> 
@@ -262,7 +274,7 @@ init_bookmaker_account() ->
 
 %% Ensure this node has local copies of all tables
 ensure_table_copies() ->
-    Tables = [account, game, bet],
+    Tables = [counter, account, game, bet],
     lists:foreach(fun(Table) ->
         case mnesia:add_table_copy(Table, node(), disc_copies) of
             {atomic, ok} ->
@@ -274,3 +286,27 @@ ensure_table_copies() ->
         end
     end, Tables),
     ok.
+%% Get next game ID
+next_game_id() ->
+    next_id(game_id).
+
+%% Get next bet ID
+next_bet_id() ->
+    next_id(bet_id).
+
+%% Generic function to get next ID from counter
+next_id(CounterName) ->
+    F = fun() ->
+        case mnesia:read(counter, CounterName) of
+            [] ->
+                %% Initialize counter
+                mnesia:write(#counter{name = CounterName, value = 1}),
+                1;
+            [#counter{value = Current}] ->
+                Next = Current + 1,
+                mnesia:write(#counter{name = CounterName, value = Next}),
+                Next
+        end
+    end,
+    {atomic, Id} = mnesia:transaction(F),
+    Id.

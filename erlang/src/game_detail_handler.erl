@@ -21,8 +21,8 @@ init(Req0, State) ->
 handle_get(Req0, State) ->
     case jwt_helper:validate_jwt(Req0) of
         {ok, _UserId, _IsAdmin} ->
-            GameIdStr = cowboy_req:binding(game_id, Req0),
-            GameId = string_to_ref(GameIdStr),
+            GameIdBin = cowboy_req:binding(game_id, Req0),
+            GameId = binary_to_integer(GameIdBin),
             {ok, Game} = get_game(GameId),
             Req = reply_json(Req0, 200, Game),
             {ok, Req, State};
@@ -68,7 +68,7 @@ game_to_map(#game{
     created_at = CreatedAt
 }, Odd1, Odd2, CapOpt1, CapOpt2) ->
     #{
-        game_id => ref_to_string(GameId),
+        game_id => GameId,
         question_text => Question,
         opt1_text => Opt1,
         opt2_text => Opt2,
@@ -82,14 +82,6 @@ game_to_map(#game{
         cap_opt2 => CapOpt2,
         created_at => CreatedAt
     }.
-
-string_to_ref(RefStr) when is_binary(RefStr) ->
-    erlang:list_to_ref(binary_to_list(RefStr)).
-
-ref_to_string(Ref) when is_reference(Ref) ->
-    list_to_binary(erlang:ref_to_list(Ref));
-ref_to_string(Other) ->
-    Other.
 
 result_to_binary(undefined) -> null;
 result_to_binary(opt1) -> <<"opt1">>;

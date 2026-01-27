@@ -76,7 +76,7 @@ game_to_map(#game{
     created_at = CreatedAt
 }, Odd1, Odd2, CapOpt1, CapOpt2) ->
     #{
-        game_id => ref_to_string(GameId),
+        game_id => GameId,
         question_text => Question,
         opt1_text => Opt1,
         opt2_text => Opt2,
@@ -90,11 +90,6 @@ game_to_map(#game{
         cap_opt2 => CapOpt2,
         created_at => CreatedAt
     }.
-
-ref_to_string(Ref) when is_reference(Ref) ->
-    list_to_binary(erlang:ref_to_list(Ref));
-ref_to_string(Other) ->
-    Other.
 
 result_to_binary(undefined) -> null;
 result_to_binary(opt1) -> <<"opt1">>;

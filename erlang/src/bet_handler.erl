@@ -35,13 +35,13 @@ handle_bet_placement(Req0, UserId, State) ->
     {ok, Body, Req1} = cowboy_req:read_body(Req0),
     
     try
-        {GameIdStr, Amount, Choice} = parse_bet_request(Body),
-        GameId = string_to_ref(GameIdStr),
+        {GameIdInt, Amount, Choice} = parse_bet_request(Body),
+        GameId = GameIdInt,
         {BetId, GId, NewOdd1, NewOdd2, NewCapOpt1, NewCapOpt2, NewBalance, BetOdd} = place_bet(UserId, GameId, Amount, Choice),
         
         %% Broadcast odds update to all clients
         spawn(fun() -> 
-            broadcast_dispatcher:broadcast({update_odds, ref_to_string(GId), NewOdd1, NewOdd2, NewCapOpt1, NewCapOpt2})
+            broadcast_dispatcher:broadcast({update_odds, GId, NewOdd1, NewOdd2, NewCapOpt1, NewCapOpt2})
         end),
         
         %% Broadcast balance update to the specific user
@@ -128,7 +128,7 @@ place_bet(UserId, GameId, Amount, Choice) when Amount > 0 ->
         end,
         mnesia:write(UpdatedGame),
         
-        BetId = make_ref(),
+        BetId = betting_node_mnesia:next_bet_id(),
         Bet = #bet{
             bet_id = BetId,
             user_id = UserId,
@@ -158,14 +158,6 @@ place_bet(UserId, GameId, Amount, Choice) when Amount > 0 ->
     
     {atomic, Result} = mnesia:transaction(F),
     Result.
-
-string_to_ref(RefStr) when is_binary(RefStr) ->
-    erlang:list_to_ref(binary_to_list(RefStr)).
-
-ref_to_string(Ref) when is_reference(Ref) ->
-    list_to_binary(erlang:ref_to_list(Ref));
-ref_to_string(Other) ->
-    Other.
 
 reply_json(Req, Status, Body) ->
     NodeName = list_to_binary(atom_to_list(node())),

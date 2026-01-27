@@ -31,12 +31,12 @@ handle_post(Req0, State) ->
             _ -> erlang:error(invalid_result)
         end,
 
-        GameId = string_to_ref(GameIdStr),
+        GameId = GameIdInt,
         {WinnersCount, TotalPaid} = finish_game(GameId, Result),
 
         Resp = reply_json(Req1, 200, #{
             message => <<"Game finished and payouts processed">>,
-            game_id => GameIdStr,
+            game_id => GameIdInt,
             result => result_to_binary(Result),
             winners_count => WinnersCount,
             total_paid => TotalPaid
@@ -150,9 +150,6 @@ refund_all_bets(GameId) ->
                 {Count, TotalRefunded, Updates}
         end
     end, {0, 0.0, []}, AllBets).
-
-string_to_ref(RefStr) when is_binary(RefStr) ->
-    erlang:list_to_ref(binary_to_list(RefStr)).
 
 result_to_binary(opt1) -> <<"opt1">>;
 result_to_binary(opt2) -> <<"opt2">>;
