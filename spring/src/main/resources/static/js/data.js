@@ -100,7 +100,7 @@ async function fetchBalance() {
 }
 
 // Admin API Functions
-async function createGameAPI(questionText, opt1Text, opt2Text) {
+async function createGameAPI(questionText, opt1Text, opt2Text, category) {
     try {
         const response = await fetch(`${API_BASE_URL}/admin/game`, {
             method: 'POST',
@@ -108,7 +108,8 @@ async function createGameAPI(questionText, opt1Text, opt2Text) {
             body: JSON.stringify({
                 question_text: questionText,
                 opt1_text: opt1Text,
-                opt2_text: opt2Text
+                opt2_text: opt2Text,
+                category: category
             })
         });
         

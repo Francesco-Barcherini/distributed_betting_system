@@ -52,14 +52,13 @@ async function loadAdminGames() {
             
             // ID cell
             const idCell = document.createElement('td');
-            idCell.textContent = game.game_id.substring(0, 8) + '...'; // Shorten the ref
-            idCell.title = game.game_id; // Show full ID on hover
+            idCell.textContent = game.game_id; // Now a simple integer
             
-            // Category cell (not in backend, default to 'real')
+            // Category cell
             const categoryCell = document.createElement('td');
             const categoryBadge = document.createElement('span');
-            categoryBadge.className = 'category-badge real';
-            categoryBadge.textContent = 'real';
+            categoryBadge.className = `category-badge ${game.category || 'real'}`;
+            categoryBadge.textContent = game.category || 'real';
             categoryCell.appendChild(categoryBadge);
             
             // Title cell
@@ -134,6 +133,7 @@ async function loadAdminGames() {
 async function createBet(event) {
     event.preventDefault();
     
+    const category = document.getElementById('bet-category').value;
     const questionText = document.getElementById('bet-title').value;
     const opt1Text = document.getElementById('bet-option1').value;
     const opt2Text = document.getElementById('bet-option2').value;
@@ -144,7 +144,7 @@ async function createBet(event) {
     }
     
     try {
-        const result = await createGameAPI(questionText, opt1Text, opt2Text);
+        const result = await createGameAPI(questionText, opt1Text, opt2Text, category);
         
         // Show success message
         alert(`Game created successfully!\nID: ${result.game_id}\nQuestion: ${questionText}`);

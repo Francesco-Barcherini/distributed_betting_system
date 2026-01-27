@@ -76,11 +76,9 @@ async function loadBets() {
     }
 }
 
-// Determine category based on game properties (you can adjust this logic)
+// Determine category based on game properties
 function getCategoryFromGame(game) {
-    // For now, we'll default to 'real' since the backend doesn't have category
-    // You could add logic based on game properties if needed
-    return 'real';
+    return game.category || 'real';
 }
 
 // Create bet card element

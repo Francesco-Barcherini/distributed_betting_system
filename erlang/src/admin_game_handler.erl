@@ -23,10 +23,17 @@ handle_post(Req0, State) ->
         #{
             <<"question_text">> := QuestionText,
             <<"opt1_text">> := Opt1Text,
-            <<"opt2_text">> := Opt2Text
+            <<"opt2_text">> := Opt2Text,
+            <<"category">> := CategoryBin
         } = jsx:decode(Body, [return_maps]),
+        
+        Category = case CategoryBin of
+            <<"real">> -> real;
+            <<"virtual">> -> virtual;
+            _ -> erlang:error(invalid_category)
+        end,
 
-        GameId = create_game(QuestionText, Opt1Text, Opt2Text),
+        GameId = create_game(QuestionText, Opt1Text, Opt2Text, Category),
         Resp = reply_json(Req1, 201, #{
             message => <<"Game created successfully">>,
             game_id => GameId
@@ -37,13 +44,14 @@ handle_post(Req0, State) ->
             {ok, reply_json(Req0, 500, #{error => <<"internal_error">>}), State}
     end.
 
-create_game(QuestionText, Opt1Text, Opt2Text) ->
+create_game(QuestionText, Opt1Text, Opt2Text, Category) ->
     GameId = betting_node_mnesia:next_game_id(),
     Game = #game{
         game_id = GameId,
         question_text = QuestionText,
         opt1_text = Opt1Text,
         opt2_text = Opt2Text,
+        category = Category,
         result = undefined,
         betting_open = true,
         tot_opt1 = 0.0,
@@ -59,7 +67,7 @@ create_game(QuestionText, Opt1Text, Opt2Text) ->
 
     %% Broadcast new game to all clients
     spawn(fun() ->
-        broadcast_dispatcher:broadcast({new_game, GameId, QuestionText, Opt1Text, Opt2Text})
+        broadcast_dispatcher:broadcast({new_game, GameId, QuestionText, Opt1Text, Opt2Text, Category})
     end),
 
     GameId.

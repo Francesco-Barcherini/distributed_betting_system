@@ -69,6 +69,7 @@ game_to_map(#game{
     question_text = Question,
     opt1_text = Opt1,
     opt2_text = Opt2,
+    category = Category,
     result = Result,
     betting_open = BettingOpen,
     tot_opt1 = TotOpt1,
@@ -80,6 +81,7 @@ game_to_map(#game{
         question_text => Question,
         opt1_text => Opt1,
         opt2_text => Opt2,
+        category => category_to_binary(Category),
         result => result_to_binary(Result),
         betting_open => BettingOpen,
         tot_opt1 => TotOpt1,
@@ -90,6 +92,10 @@ game_to_map(#game{
         cap_opt2 => CapOpt2,
         created_at => CreatedAt
     }.
+
+category_to_binary(real) -> <<"real">>;
+category_to_binary(virtual) -> <<"virtual">>;
+category_to_binary(_) -> <<"real">>.
 
 result_to_binary(undefined) -> null;
 result_to_binary(opt1) -> <<"opt1">>;

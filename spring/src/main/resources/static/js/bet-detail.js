@@ -116,8 +116,9 @@ function displayGameDetails() {
     if (!currentGame) return;
     
     // Populate game details
-    document.getElementById('detail-category').textContent = 'real'; // Default category
-    document.getElementById('detail-category').className = 'bet-category';
+    const category = currentGame.category || 'real';
+    document.getElementById('detail-category').textContent = category;
+    document.getElementById('detail-category').className = `bet-category ${category}`;
     document.getElementById('detail-title').textContent = currentGame.question_text;
     
     const totalVolume = (currentGame.tot_opt1 || 0) + (currentGame.tot_opt2 || 0);

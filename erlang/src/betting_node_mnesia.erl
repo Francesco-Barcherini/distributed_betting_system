@@ -17,6 +17,7 @@
     question_text,  % Question text
     opt1_text,      % Option 1 text
     opt2_text,      % Option 2 text
+    category,       % real | virtual
     result,         % Result: undefined | opt1 | opt2
     betting_open,   % Boolean
     tot_opt1,       % Total amount bet on option 1
