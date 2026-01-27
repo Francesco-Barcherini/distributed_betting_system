@@ -131,8 +131,15 @@ init_worker_node() ->
         true ->
             io:format("Connected to master node~n"),
             io:format("Waiting for master to initialize Mnesia...~n"),
+            
+            %% Wait for master to finish creating schema and starting Mnesia
+            timer:sleep(5000),
+            
             %% Master will create schema and start Mnesia via RPC, just wait for tables
             wait_for_tables(),
+            
+            %% Ensure we have local copies of all tables
+            ensure_table_copies(),
             ok;
         false ->
             io:format("~n"),
@@ -188,14 +195,21 @@ create_tables(Nodes) ->
 
 wait_for_tables() ->
     Tables = [account, game, bet],
-    case mnesia:wait_for_tables(Tables, 10000) of
-        ok -> ok;
+    io:format("Waiting for tables: ~p~n", [Tables]),
+    case mnesia:wait_for_tables(Tables, 30000) of
+        ok -> 
+            io:format("All tables ready~n"),
+            ok;
         {timeout, BadTables} ->
             io:format("Timeout waiting for tables: ~p~n", [BadTables]),
-            ok;
+            io:format("Retrying...~n"),
+            timer:sleep(5000),
+            wait_for_tables();
         {error, Reason} ->
             io:format("Error waiting for tables: ~p~n", [Reason]),
-            ok
+            io:format("Retrying...~n"),
+            timer:sleep(5000),
+            wait_for_tables()
     end.
 
 %% Wait for all nodes to connect before proceeding
@@ -244,4 +258,19 @@ init_bookmaker_account() ->
         end
     end,
     {atomic, _} = mnesia:transaction(F),
+    ok.
+
+%% Ensure this node has local copies of all tables
+ensure_table_copies() ->
+    Tables = [account, game, bet],
+    lists:foreach(fun(Table) ->
+        case mnesia:add_table_copy(Table, node(), disc_copies) of
+            {atomic, ok} ->
+                io:format("Added local copy of table ~p~n", [Table]);
+            {aborted, {already_exists, _, _}} ->
+                io:format("Table ~p already has local copy~n", [Table]);
+            {aborted, Reason} ->
+                io:format("Failed to add local copy of table ~p: ~p~n", [Table, Reason])
+        end
+    end, Tables),
     ok.
