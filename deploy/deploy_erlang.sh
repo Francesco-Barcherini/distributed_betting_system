@@ -72,20 +72,31 @@ chmod +x start_node.sh
 
 echo "Application compiled successfully on $NODE_NAME"
 echo "Startup script created: ~/distributed_betting_system/erlang/start_node.sh"
+
+# Stop existing node if running
+echo "Stopping any existing node..."
+pkill -f "name ${NODE_NAME}@${NODE_IP}" || true
+sleep 2
+
+# Start the node in detached mode
+echo "Starting ${NODE_NAME}..."
+./start_node.sh -detached
+
+# Wait a bit and verify the node started
+sleep 3
+if pgrep -f "name ${NODE_NAME}@${NODE_IP}" > /dev/null; then
+    echo "✅ Node ${NODE_NAME} is running"
+else
+    echo "❌ Failed to start ${NODE_NAME}"
+    exit 1
+fi
+
+# Verify the port is listening
+if ss -tlnp 2>/dev/null | grep -q ":8080" || netstat -tlnp 2>/dev/null | grep -q ":8080"; then
+    echo "✅ Port 8080 is listening"
+else
+    echo "⚠️  Warning: Port 8080 may not be listening yet (check manually)"
+fi
 REMOTE
 
-echo "✅ Erlang Node $NODE_NUM deployed to $NODE_IP"
-echo ""
-echo "To start the node, SSH to $NODE_IP and run:"
-echo "  cd ~/distributed_betting_system/erlang"
-echo "  ./start_node.sh              # foreground mode"
-echo "  ./start_node.sh -detached    # background mode"
-echo ""
-echo "The node will start as: ${NODE_NAME}@${NODE_IP}"
-if [ "$NODE_NUM" == "1" ]; then
-    echo ""
-    echo "Note: Node 1 (master) must be started FIRST before other nodes."
-else
-    echo ""
-    echo "Note: Make sure Node 1 ($ERLANG1_IP) is running first!"
-fi
+echo "✅ Erlang Node $NODE_NUM deployed and started on $NODE_IP"
