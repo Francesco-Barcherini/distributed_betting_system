@@ -1,6 +1,7 @@
 // Common WebSocket connection management
 let ws = null;
 let wsMessageHandlers = [];
+let pingInterval = null;
 
 function connectWebSocket() {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -18,6 +19,17 @@ function connectWebSocket() {
                 token: token 
             }));
         }
+        
+        // Start ping interval to keep connection alive
+        if (pingInterval) {
+            clearInterval(pingInterval);
+        }
+        pingInterval = setInterval(() => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ opcode: 'ping' }));
+                console.log('Ping sent');
+            }
+        }, 30000); // 30 seconds
     };
     
     ws.onmessage = (event) => {
@@ -43,6 +55,11 @@ function connectWebSocket() {
     
     ws.onclose = () => {
         console.log('WebSocket disconnected');
+        // Clear ping interval
+        if (pingInterval) {
+            clearInterval(pingInterval);
+            pingInterval = null;
+        }
         // Attempt to reconnect after 3 seconds
         setTimeout(connectWebSocket, 3000);
     };
