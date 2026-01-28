@@ -39,6 +39,9 @@ OPZIONALE
   - [] separare websocket tra bet page e dashboard
   - [] id fatti bene e non il counter condiviso
 
+Un po' meno opzionale
+  - [] capire perché cavolo la post su login ci mette 2 secondi a rispondere
+   
 ## API endpoints
 - API login/registrazione/logout (user e admin)
 - JWT validato ma account non in MnesiaDB -> creazione account con 100€ iniziali POST /session {id, timestamp}
