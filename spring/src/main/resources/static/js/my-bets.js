@@ -33,7 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // Show admin link if user is admin
-    const user = JSON.parse(currentUser);
     if (user.isAdmin) {
         document.getElementById('admin-link').style.display = 'inline';
     }
