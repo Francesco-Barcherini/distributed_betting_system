@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!checkAuthExpiration()) {
         return; // checkAuthExpiration handles redirect
     }
-    
+    const user = JSON.parse(currentUser);
     // Show admin link if user is admin
     if (user.isAdmin) {
         document.getElementById('admin-link').style.display = 'inline';
