@@ -98,6 +98,25 @@
     color: white;
 }
 
+/* Disabled/Closed state for outcome buttons */
+.outcome-btn.disabled {
+    cursor: not-allowed !important;
+    opacity: 0.5;
+    background: var(--bg-card);
+    border-color: var(--border);
+    pointer-events: none;
+}
+
+.outcome-btn.disabled:hover {
+    border-color: var(--border);
+    background: var(--bg-card);
+}
+
+.outcome-btn.disabled .outcome-btn-label,
+.outcome-btn.disabled .outcome-btn-odds {
+    color: var(--text-secondary);
+}
+
 .potential-return {
     display: flex;
     justify-content: space-between;

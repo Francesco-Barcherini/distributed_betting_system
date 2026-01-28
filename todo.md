@@ -31,6 +31,7 @@
   - [] Aggiungere POST /balance per aumentare il saldo
   - [] Display bet amount input only after selecting an option
   - [] Redirect to login if JWT expired
+  - [X] Disabilitare meglio le opzioni delle scommesse chiuse
 
 OPZIONALE 
   - [] separare websocket tra bet page e dashboard

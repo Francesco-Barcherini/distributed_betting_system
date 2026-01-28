@@ -62,8 +62,12 @@ registerWSMessageHandler((data) => {
                 currentGame.betting_open = false;
                 displayGameDetails();
                 
-                // Reload user's bets to show outcome
-                loadMyBetsForGame(currentGame.game_id);
+                // Reload user's bets to show outcome (skip for guests)
+                const currentUserData = localStorage.getItem('currentUser');
+                const userData = currentUserData ? JSON.parse(currentUserData) : null;
+                if (userData && !userData.isGuest) {
+                    loadMyBetsForGame(currentGame.game_id);
+                }
                 
                 // Apply pending balance update if there is one
                 if (pendingBalanceUpdate !== null) {
@@ -81,8 +85,12 @@ registerWSMessageHandler((data) => {
             currentGame.betting_open = false;
             displayGameDetails();
             
-            // Reload user's bets to show outcome
-            loadMyBetsForGame(currentGame.game_id);
+            // Reload user's bets to show outcome (skip for guests)
+            const currentUserData = localStorage.getItem('currentUser');
+            const userData = currentUserData ? JSON.parse(currentUserData) : null;
+            if (userData && !userData.isGuest) {
+                loadMyBetsForGame(currentGame.game_id);
+            }
         }
     }
 });
@@ -107,6 +115,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Hide balance for guests
         const balanceCard = document.querySelector('.balance-card');
         if (balanceCard) balanceCard.style.display = 'none';
+        
+        // Hide My Bets section for guests
+        const myBetsSection = document.getElementById('my-bets-section');
+        if (myBetsSection) myBetsSection.style.display = 'none';
     } else {
         // Show Logout and My Bets, hide Login/Register
         document.getElementById('login-link').style.display = 'none';
@@ -170,8 +182,12 @@ async function loadGameDetail(gameId) {
         currentGame = await fetchGameDetail(gameId);
         displayGameDetails();
         
-        // Load user's bets for this game
-        loadMyBetsForGame(gameId);
+        // Load user's bets for this game (skip for guests)
+        const currentUserData = localStorage.getItem('currentUser');
+        const userData = currentUserData ? JSON.parse(currentUserData) : null;
+        if (userData && !userData.isGuest) {
+            loadMyBetsForGame(gameId);
+        }
         
         // Initialize spinning wheel for virtual events if needed
         const category = currentGame.category || 'real';
@@ -208,12 +224,10 @@ function displayGameDetails() {
     // Option 1
     const btn1 = document.createElement('div');
     btn1.className = 'outcome-btn';
-    if (!currentGame.result) {
+    if (!currentGame.result && currentGame.betting_open) {
         btn1.onclick = () => selectOutcome('opt1');
     } else {
         btn1.classList.add('disabled');
-        btn1.style.cursor = 'not-allowed';
-        btn1.style.opacity = '0.6';
     }
     
     const label1 = document.createElement('span');
@@ -231,12 +245,10 @@ function displayGameDetails() {
     // Option 2
     const btn2 = document.createElement('div');
     btn2.className = 'outcome-btn';
-    if (!currentGame.result) {
+    if (!currentGame.result && currentGame.betting_open) {
         btn2.onclick = () => selectOutcome('opt2');
     } else {
         btn2.classList.add('disabled');
-        btn2.style.cursor = 'not-allowed';
-        btn2.style.opacity = '0.6';
     }
     
     const label2 = document.createElement('span');
@@ -269,7 +281,6 @@ function displayGameDetails() {
         if (placeBetBtn) {
             placeBetBtn.disabled = true;
             placeBetBtn.textContent = currentGame.result ? 'Game Finished' : 'Betting Closed';
-            placeBetBtn.style.cursor = 'not-allowed';
         }
     } else {
         const placeBetBtn = document.querySelector('button[onclick="placeBet()"]');
@@ -631,8 +642,12 @@ async function placeBet() {
             displayGameDetails();
         }
         
-        // Reload user's bets for this game
-        loadMyBetsForGame(currentGame.game_id);
+        // Reload user's bets for this game (skip for guests - though guests can't bet anyway)
+        const currentUserData = localStorage.getItem('currentUser');
+        const userData = currentUserData ? JSON.parse(currentUserData) : null;
+        if (userData && !userData.isGuest) {
+            loadMyBetsForGame(currentGame.game_id);
+        }
         
         // Reset form
         document.getElementById('bet-amount').value = '';
