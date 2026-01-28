@@ -41,6 +41,18 @@ function closeErrorModal() {
     }
 }
 
+// Helper function to check if current user is a guest
+function isGuest() {
+    const currentUser = localStorage.getItem('currentUser');
+    if (!currentUser) return false;
+    try {
+        const user = JSON.parse(currentUser);
+        return user.isGuest === true;
+    } catch {
+        return false;
+    }
+}
+
 // Helper function to format timestamp in European format (local timezone)
 function formatEuropeanDateTime(timestampInSeconds) {
     const date = new Date(timestampInSeconds * 1000); // Convert seconds to milliseconds

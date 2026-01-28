@@ -40,17 +40,37 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
     
-    // Show admin link if user is admin
     const user = JSON.parse(currentUser);
-    if (user.isAdmin) {
-        document.getElementById('admin-link').style.display = 'inline';
+    
+    // Update navbar for guests
+    if (user.isGuest) {
+        // Show Login/Register, hide My Bets and Logout
+        document.getElementById('my-bets-link').style.display = 'none';
+        document.getElementById('logout-link').style.display = 'none';
+        document.getElementById('login-link').style.display = 'inline';
+        
+        // Hide balance for guests
+        const balanceCard = document.querySelector('.balance-card');
+        if (balanceCard) balanceCard.style.display = 'none';
+    } else {
+        // Show Logout and My Bets, hide Login/Register
+        document.getElementById('login-link').style.display = 'none';
+        
+        // Show admin link if user is admin
+        if (user.isAdmin) {
+            document.getElementById('admin-link').style.display = 'inline';
+        }
     }
     
     // Connect WebSocket
     connectWebSocket();
     
     loadBets();
-    loadBalance();
+    
+    // Load balance only for authenticated users
+    if (!user.isGuest) {
+        loadBalance();
+    }
 });
 
 // Load and display bets

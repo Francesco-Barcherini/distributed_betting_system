@@ -95,10 +95,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
     
-    // Show admin link if user is admin
     const user = JSON.parse(currentUser);
-    if (user.isAdmin) {
-        document.getElementById('admin-link').style.display = 'inline';
+    
+    // Update navbar for guests
+    if (user.isGuest) {
+        // Show Login/Register, hide My Bets and Logout
+        document.getElementById('my-bets-link').style.display = 'none';
+        document.getElementById('logout-link').style.display = 'none';
+        document.getElementById('login-link').style.display = 'inline';
+        
+        // Hide balance for guests
+        const balanceCard = document.querySelector('.balance-card');
+        if (balanceCard) balanceCard.style.display = 'none';
+    } else {
+        // Show Logout and My Bets, hide Login/Register
+        document.getElementById('login-link').style.display = 'none';
+        
+        // Show admin link if user is admin
+        if (user.isAdmin) {
+            document.getElementById('admin-link').style.display = 'inline';
+        }
     }
     
     // Connect WebSocket
@@ -113,8 +129,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
     
-    // Load user balance
-    await loadBalance();
+    // Load user balance (skip for guests)
+    const currentUserData = localStorage.getItem('currentUser');
+    const userData = currentUserData ? JSON.parse(currentUserData) : null;
+    if (userData && !userData.isGuest) {
+        await loadBalance();
+    }
     
     // Load game details
     await loadGameDetail(gameId);
@@ -285,6 +305,14 @@ function displayGameDetails() {
 
 // Select outcome
 function selectOutcome(choice) {
+    // Check if user is a guest
+    const currentUserData = localStorage.getItem('currentUser');
+    const userData = currentUserData ? JSON.parse(currentUserData) : null;
+    if (userData && userData.isGuest) {
+        showErrorModal('Please login or register to place bets');
+        return;
+    }
+    
     if (!currentGame.betting_open || currentGame.result) {
         showErrorModal('Betting is closed for this game');
         return;
@@ -548,6 +576,14 @@ function spinWheelWithCallback(stopColor, callback) {
 
 // Place bet
 async function placeBet() {
+    // Check if user is a guest
+    const currentUserData = localStorage.getItem('currentUser');
+    const userData = currentUserData ? JSON.parse(currentUserData) : null;
+    if (userData && userData.isGuest) {
+        showErrorModal('Please login or register to place bets');
+        return;
+    }
+    
     const amount = parseFloat(document.getElementById('bet-amount').value);
     
     if (!amount || amount <= 0) {

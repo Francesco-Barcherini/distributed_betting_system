@@ -17,7 +17,7 @@
     - [x] Token JWT condivisi con Erlang (to see further with erlang implementation)
     - [x] Protocollo di sicurezza e validazione JWT
 - Generale
-  - [] Utenti non registrati possono vedere cose
+  - [X] Utenti non registrati possono vedere cose
   - [] Separare vecchie scommesse da quelle attive
   - [X] Data di bet da correggere (1970)
   - [X] Togliere alert e sostituire con modal

@@ -76,7 +76,13 @@ function handleRegister(event) {
             localStorage.setItem('authExpiry', String(data.expiryTimeEpochSeconds));
             window.location.href = 'dashboard.html';
         })
-        .catch((err) => alert(err.message));
+        .catch((err) => showErrorModal(err.message));
+}
+
+// Continue as guest
+function continueAsGuest() {
+    localStorage.setItem('currentUser', JSON.stringify({ isGuest: true }));
+    window.location.href = 'dashboard.html';
 }
 
 // Check if already logged in

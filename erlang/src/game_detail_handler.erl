@@ -19,20 +19,12 @@ init(Req0, State) ->
     end.
 
 handle_get(Req0, State) ->
-    case jwt_helper:validate_jwt(Req0) of
-        {ok, _UserId, _IsAdmin} ->
-            GameIdBin = cowboy_req:binding(game_id, Req0),
-            GameId = binary_to_integer(GameIdBin),
-            {ok, Game} = get_game(GameId),
-            Req = reply_json(Req0, 200, Game),
-            {ok, Req, State};
-        {error, missing_token} ->
-            Req = reply_json(Req0, 401, #{error => <<"Missing authorization token">>}),
-            {ok, Req, State};
-        {error, _Reason} ->
-            Req = reply_json(Req0, 401, #{error => <<"Invalid or expired token">>}),
-            {ok, Req, State}
-    end.
+    %% Allow access without JWT for guests to view game details
+    GameIdBin = cowboy_req:binding(game_id, Req0),
+    GameId = binary_to_integer(GameIdBin),
+    {ok, Game} = get_game(GameId),
+    Req = reply_json(Req0, 200, Game),
+    {ok, Req, State}.
 
 get_game(GameId) ->
     F = fun() ->

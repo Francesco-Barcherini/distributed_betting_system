@@ -24,6 +24,14 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
     
+    const user = JSON.parse(currentUser);
+    
+    // Guests cannot access My Bets page
+    if (user.isGuest) {
+        window.location.href = 'dashboard.html';
+        return;
+    }
+    
     // Show admin link if user is admin
     const user = JSON.parse(currentUser);
     if (user.isAdmin) {

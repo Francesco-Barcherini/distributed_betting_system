@@ -19,18 +19,10 @@ init(Req0, State) ->
     end.
 
 handle_get(Req0, State) ->
-    case jwt_helper:validate_jwt(Req0) of
-        {ok, _UserId, _IsAdmin} ->
-            {ok, Games} = get_all_games(),
-            Req = reply_json(Req0, 200, #{games => Games}),
-            {ok, Req, State};
-        {error, missing_token} ->
-            Req = reply_json(Req0, 401, #{error => <<"Missing authorization token">>}),
-            {ok, Req, State};
-        {error, _Reason} ->
-            Req = reply_json(Req0, 401, #{error => <<"Invalid or expired token">>}),
-            {ok, Req, State}
-    end.
+    %% Allow access without JWT for guests to view games
+    {ok, Games} = get_all_games(),
+    Req = reply_json(Req0, 200, #{games => Games}),
+    {ok, Req, State}.
 
 get_all_games() ->
     F = fun() ->
