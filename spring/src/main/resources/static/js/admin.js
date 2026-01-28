@@ -296,6 +296,12 @@ async function createBet(event) {
         // Reset form
         document.getElementById('create-bet-form').reset();
         
+        // Add category change listener
+        const opt1Input = document.getElementById('bet-option1');
+        const opt2Input = document.getElementById('bet-option2');
+        opt1Input.disabled = false;
+        opt2Input.disabled = false;
+
         // Reload table
         loadAdminGames();
     } catch (error) {

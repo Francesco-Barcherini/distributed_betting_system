@@ -74,13 +74,20 @@ function addNewGameDOM(gameData) {
         return; // Don't display if filtered out
     }
     
+    // Find or create active section
+    const grid = document.getElementById('bets-grid');
+    
+    // Remove "No games available" message if present
+    const firstChild = grid.firstElementChild;
+    if (firstChild && firstChild.textContent.includes('No games available')) {
+        grid.innerHTML = '';
+    }
+    
     // Create card
     const card = createBetCard(game);
     card.style.opacity = '0';
     card.style.transform = 'translateY(-20px)';
     
-    // Find or create active section
-    const grid = document.getElementById('bets-grid');
     let activeHeader = grid.querySelector('.section-header.active-header');
     
     if (!activeHeader) {
