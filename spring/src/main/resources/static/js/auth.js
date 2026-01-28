@@ -53,7 +53,7 @@ function handleRegister(event) {
     const confirm = document.getElementById('register-confirm').value;
 
     if (password !== confirm) {
-        alert('Passwords do not match!');
+        showErrorModal('Passwords do not match!');
         return;
     }
 

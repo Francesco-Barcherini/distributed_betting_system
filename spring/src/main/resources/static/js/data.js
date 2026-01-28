@@ -1,6 +1,46 @@
 // API Configuration
 const API_BASE_URL = '/api';
 
+// Error Modal Functions
+function showErrorModal(message) {
+    // Create modal if it doesn't exist
+    let modal = document.getElementById('error-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'error-modal';
+        modal.className = 'error-modal';
+        modal.innerHTML = `
+            <div class="error-modal-content">
+                <div class="error-modal-header">
+                    <div class="error-modal-icon">!</div>
+                    <div class="error-modal-title">Error</div>
+                </div>
+                <div class="error-modal-message" id="error-modal-message"></div>
+                <button class="error-modal-button" onclick="closeErrorModal()">OK</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        // Close on background click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeErrorModal();
+            }
+        });
+    }
+    
+    // Set message and show
+    document.getElementById('error-modal-message').textContent = message;
+    modal.classList.add('active');
+}
+
+function closeErrorModal() {
+    const modal = document.getElementById('error-modal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
 // Helper function to format timestamp in European format (local timezone)
 function formatEuropeanDateTime(timestampInSeconds) {
     const date = new Date(timestampInSeconds * 1000); // Convert seconds to milliseconds

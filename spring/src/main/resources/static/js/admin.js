@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check if user is admin
     const user = JSON.parse(currentUser);
     if (!user.isAdmin) {
-        alert('Access denied. Admin privileges required.');
+        showErrorModal('Access denied. Admin privileges required.');
         window.location.href = 'dashboard.html';
         return;
     }
@@ -158,23 +158,20 @@ async function createBet(event) {
     const opt2Text = document.getElementById('bet-option2').value;
     
     if (!questionText || !opt1Text || !opt2Text) {
-        alert('Please fill in all fields');
+        showErrorModal('Please fill in all fields');
         return;
     }
     
     try {
         const result = await createGameAPI(questionText, opt1Text, opt2Text, category);
-        
-        // Show success message
-        alert(`Game created successfully!\nID: ${result.game_id}\nQuestion: ${questionText}`);
-        
+
         // Reset form
         document.getElementById('create-bet-form').reset();
         
         // Reload table
         loadAdminGames();
     } catch (error) {
-        alert(`Failed to create game: ${error.message}`);
+        showErrorModal(`Failed to create game: ${error.message}`);
     }
 }
 
@@ -186,10 +183,9 @@ async function stopBettingForGame(gameId) {
     if (confirm(`Stop betting on "${game.question_text}"?`)) {
         try {
             await stopBettingAPI(gameId);
-            alert('Betting stopped successfully!');
             loadAdminGames();
         } catch (error) {
-            alert(`Failed to stop betting: ${error.message}`);
+            showErrorModal(`Failed to stop betting: ${error.message}`);
         }
     }
 }
@@ -244,10 +240,8 @@ async function setResult(gameId, result, resultText) {
             
             closeResultModal();
             loadAdminGames();
-            
-            alert(`Result set successfully!\nGame: ${game.question_text}\nWinner: ${resultText}\nWinners: ${response.winners_count}\nTotal Paid: $${response.total_paid.toFixed(2)}`);
         } catch (error) {
-            alert(`Failed to set result: ${error.message}`);
+            showErrorModal(`Failed to set result: ${error.message}`);
         }
     }
 }

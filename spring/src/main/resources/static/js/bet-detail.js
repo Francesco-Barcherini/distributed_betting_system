@@ -37,9 +37,7 @@ registerWSMessageHandler((data) => {
             updateBalanceDisplay();
         }
     } else if (data.opcode === 'bet_confirmed' && currentGame && data.game_id === currentGame.game_id) {
-        // Show bet confirmation (balance will be updated via balance_update message)
         const choiceText = data.choice === 'opt1' ? currentGame.opt1_text : currentGame.opt2_text;
-        alert(`Bet placed successfully!\n\nAmount: $${data.amount.toFixed(2)}\nOutcome: ${choiceText}\nOdds: ${data.odd.toFixed(2)}x\nPotential Return: $${(data.amount * data.odd).toFixed(2)}`);
     } else if (data.opcode === 'betting_closed' && currentGame && data.game_id === currentGame.game_id) {
         currentGame.betting_open = false;
         displayGameDetails();
@@ -165,7 +163,7 @@ async function loadGameDetail(gameId) {
         }
     } catch (error) {
         console.error('Error loading game details:', error);
-        alert('Failed to load game details');
+        showErrorModal('Failed to load game details');
         window.location.href = 'dashboard.html';
     }
 }
@@ -288,7 +286,7 @@ function displayGameDetails() {
 // Select outcome
 function selectOutcome(choice) {
     if (!currentGame.betting_open || currentGame.result) {
-        alert('Betting is closed for this game');
+        showErrorModal('Betting is closed for this game');
         return;
     }
     
@@ -541,11 +539,6 @@ function spinWheelWithCallback(stopColor, callback) {
                 setTimeout(() => {
                     callback();
                 }, 500); // Small delay to let user see the result
-            } else {
-                // Show result alert (original behavior for test spins)
-                setTimeout(() => {
-                    alert(`Wheel stopped on ${colorAtPointer}!\nExpected: ${stopColor.toUpperCase()}`);
-                }, 100);
             }
         }
     }
@@ -558,28 +551,28 @@ async function placeBet() {
     const amount = parseFloat(document.getElementById('bet-amount').value);
     
     if (!amount || amount <= 0) {
-        alert('Please enter a valid amount');
+        showErrorModal('Please enter a valid amount');
         return;
     }
     
     if (!selectedOutcome) {
-        alert('Please select an outcome');
+        showErrorModal('Please select an outcome');
         return;
     }
     
     if (!currentGame.betting_open || currentGame.result) {
-        alert('Betting is closed for this game');
+        showErrorModal('Betting is closed for this game');
         return;
     }
     
     const cap = selectedOutcome === 'opt1' ? currentGame.cap_opt1 : currentGame.cap_opt2;
     if (cap != null && amount > cap) {
-        alert(`Maximum bet for this option is $${cap.toFixed(2)}`);
+        showErrorModal(`Maximum bet for this option is $${cap.toFixed(2)}`);
         return;
     }
     
     if (amount > userBalance) {
-        alert('Insufficient balance');
+        showErrorModal('Insufficient balance');
         return;
     }
     
@@ -592,7 +585,6 @@ async function placeBet() {
         
         // Show success message
         const choiceText = selectedOutcome === 'opt1' ? currentGame.opt1_text : currentGame.opt2_text;
-        alert(`Bet placed successfully!\n\nAmount: $${amount.toFixed(2)}\nOutcome: ${choiceText}\nOdds: ${result.bet_odd.toFixed(2)}x\nPotential Return: $${(amount * result.bet_odd).toFixed(2)}\nNew Balance: $${result.new_balance.toFixed(2)}`);
         
         // Update odds
         if (result.new_odd1 != null && result.new_odd2 != null) {
@@ -615,7 +607,7 @@ async function placeBet() {
         updatePotentialReturn();
         
     } catch (error) {
-        alert(`Failed to place bet: ${error.message}`);
+        showErrorModal(`Failed to place bet: ${error.message}`);
     }
 }
 

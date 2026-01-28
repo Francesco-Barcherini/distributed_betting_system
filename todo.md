@@ -20,7 +20,7 @@
   - [] Utenti non registrati possono vedere cose
   - [] Separare vecchie scommesse da quelle attive
   - [X] Data di bet da correggere (1970)
-  - [] Togliere alert
+  - [X] Togliere alert e sostituire con modal
   - [] Conto admin da mostrare
   - [] Aggiornamento volume totale per ogni scommessa
   - [X] Togliere numero participants
@@ -30,6 +30,7 @@
   - [] Refreshare solo quello che va refreshato quando arriva il websocket message
   - [] Aggiungere POST /balance per aumentare il saldo
   - [] Display bet amount input only after selecting an option
+  - [] Redirect to login if JWT expired
 
 OPZIONALE 
   - [] separare websocket tra bet page e dashboard
