@@ -61,14 +61,7 @@ finish_game(GameId, Result) ->
                 TotalPool = TotOpt1 + TotOpt2,
                 WinningBets = get_winning_bets(GameId, Result),
 
-                {WinnersCount, TotalPaid, BalanceUpdates} = case Result of
-                    opt1 when TotOpt1 > 0 ->
-                        pay_winners(WinningBets);
-                    opt2 when TotOpt2 > 0 ->
-                        pay_winners(WinningBets);
-                    _ ->
-                        refund_all_bets(GameId)
-                end,
+                {WinnersCount, TotalPaid, BalanceUpdates} = pay_winners(WinningBets),
 
                 %% Update bookmaker balance: profit = total_pool - total_paid
                 BookmakerProfit = update_bookmaker_balance(TotalPool - TotalPaid),
@@ -136,22 +129,6 @@ update_bookmaker_balance(Amount) ->
             mnesia:write(#account{user_id = BookmakerId, balance = NewBalance}),
             NewBalance
     end.
-
-refund_all_bets(GameId) ->
-    AllBets = mnesia:select(bet, [{#bet{game_id = GameId, _ = '_'}, [], ['$_']}]),
-    
-    lists:foldl(fun(Bet, {Count, TotalRefunded, Updates}) ->
-        #bet{user_id = UserId, amount = Amount} = Bet,
-        
-        case mnesia:read(account, UserId) of
-            [Account = #account{balance = Balance}] ->
-                NewBalance = Balance + Amount,
-                mnesia:write(Account#account{balance = NewBalance}),
-                {Count + 1, TotalRefunded + Amount, [{UserId, NewBalance} | Updates]};
-            [] ->
-                {Count, TotalRefunded, Updates}
-        end
-    end, {0, 0.0, []}, AllBets).
 
 result_to_binary(opt1) -> <<"opt1">>;
 result_to_binary(opt2) -> <<"opt2">>;
