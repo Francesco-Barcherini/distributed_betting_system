@@ -487,9 +487,6 @@ function spinWheel(stopColor) {
 function spinWheelWithCallback(stopColor, callback) {
     if (wheelSpinning) return;
     
-    console.log('=== SPIN WHEEL DEBUG ===');
-    console.log('Target color:', stopColor);
-    
     wheelSpinning = true;
     
     // Calculate target angle based on color
@@ -497,9 +494,7 @@ function spinWheelWithCallback(stopColor, callback) {
     // Black segments are at odd positions (1, 3, 5, ..., 19)
     const segments = 20;
     const anglePerSegment = 360 / segments; // 18 degrees per segment
-    
-    console.log('Angle per segment:', anglePerSegment);
-    
+        
     // Choose a random segment of the target color
     let targetSegment;
     if (stopColor === 'red') {
@@ -510,9 +505,6 @@ function spinWheelWithCallback(stopColor, callback) {
         targetSegment = blackSegments[Math.floor(Math.random() * blackSegments.length)];
     }
     
-    console.log('Target segment index:', targetSegment);
-    console.log('Target segment should be:', targetSegment % 2 === 0 ? 'RED' : 'BLACK');
-    
     // The wheel is rotated, and pointer is at the TOP
     // In our drawing, segments start from 0 degrees (right side) when wheelAngle = 0
     // Pointer is at 270 degrees in canvas coords (top of circle)
@@ -520,8 +512,6 @@ function spinWheelWithCallback(stopColor, callback) {
     // Segment center in the original (un-rotated) wheel
     const segmentStartAngle = targetSegment * anglePerSegment;
     const segmentCenterInWheel = segmentStartAngle + anglePerSegment / 2;
-    
-    console.log('Segment center angle (in wheel):', segmentCenterInWheel);
     
     // To align this segment center with the pointer at the top (270 degrees),
     // we need to rotate the wheel by: (270 - segmentCenterInWheel) degrees
@@ -532,31 +522,21 @@ function spinWheelWithCallback(stopColor, callback) {
     while (targetAngle < 0) targetAngle += 360;
     while (targetAngle >= 360) targetAngle -= 360;
     
-    console.log('Target rotation angle:', targetAngle);
-    
     // Add multiple rotations for effect (5-7 full rotations)
     const numRotations = Math.floor(5 + Math.random() * 3); // 5, 6, or 7 complete rotations
     const extraRotations = numRotations * 360;
     const totalRotation = extraRotations + targetAngle;
-    
-    console.log('Number of rotations:', numRotations);
-    console.log('Extra rotations:', extraRotations);
-    console.log('Total rotation:', totalRotation);
     
     // Animation parameters
     const duration = 5000;
     const startTime = Date.now();
     const startAngle = wheelAngle % 360;
     
-    console.log('Starting from angle:', startAngle);
-    
     // Calculate how much we need to rotate from current position
     let angleDifference = targetAngle - startAngle;
     while (angleDifference < 0) angleDifference += 360;
     
     const finalAngle = startAngle + extraRotations + angleDifference;
-    
-    console.log('Final target angle:', finalAngle);
     
     function animate() {
         const currentTime = Date.now();
@@ -575,19 +555,7 @@ function spinWheelWithCallback(stopColor, callback) {
             wheelSpinning = false;
             const finalNormalizedAngle = wheelAngle % 360;
             wheelAngle = finalNormalizedAngle;
-            
-            console.log('Final wheel angle:', finalNormalizedAngle);
-            
-            // Verify which segment we landed on
-            const pointerAngle = 270; // Top position
-            const segmentAtPointer = Math.floor(((pointerAngle - finalNormalizedAngle + 360) % 360) / anglePerSegment) % segments;
-            const colorAtPointer = segmentAtPointer % 2 === 0 ? 'RED' : 'BLACK';
-            
-            console.log('Segment at pointer:', segmentAtPointer);
-            console.log('Color at pointer:', colorAtPointer);
-            console.log('Expected color:', stopColor.toUpperCase());
-            console.log('=== END DEBUG ===');
-            
+   
             // Execute callback if provided
             if (callback && typeof callback === 'function') {
                 setTimeout(() => {

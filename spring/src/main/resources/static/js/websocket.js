@@ -10,7 +10,6 @@ function connectWebSocket() {
     ws = new WebSocket(wsUrl);
     
     ws.onopen = () => {
-        console.log('WebSocket connected');
         // Send auth token in the format expected by the Erlang backend
         const token = localStorage.getItem('authToken');
         if (token) {
@@ -27,13 +26,11 @@ function connectWebSocket() {
         pingInterval = setInterval(() => {
             if (ws && ws.readyState === WebSocket.OPEN) {
                 ws.send(JSON.stringify({ opcode: 'ping' }));
-                console.log('Ping sent');
             }
         }, 30000); // 30 seconds
     };
     
     ws.onmessage = (event) => {
-        console.log('WebSocket message:', event.data);
         try {
             const data = JSON.parse(event.data);
             // Call all registered message handlers
@@ -54,7 +51,6 @@ function connectWebSocket() {
     };
     
     ws.onclose = () => {
-        console.log('WebSocket disconnected');
         // Clear ping interval
         if (pingInterval) {
             clearInterval(pingInterval);
