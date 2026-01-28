@@ -613,7 +613,10 @@ async function placeBet() {
     }
     
     try {
-        const result = await submitBetAPI(currentGame.game_id, amount, selectedOutcome);
+        // Get expected odds for the selected outcome
+        const expectedOdd = selectedOutcome === 'opt1' ? currentGame.odd1 : currentGame.odd2;
+        
+        const result = await submitBetAPI(currentGame.game_id, amount, selectedOutcome, expectedOdd);
         
         // Update balance
         userBalance = result.new_balance;

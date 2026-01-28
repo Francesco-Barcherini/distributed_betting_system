@@ -35,9 +35,9 @@ handle_bet_placement(Req0, UserId, State) ->
     {ok, Body, Req1} = cowboy_req:read_body(Req0),
     
     try
-        {GameIdInt, Amount, Choice} = parse_bet_request(Body),
+        {GameIdInt, Amount, Choice, ExpectedOdd} = parse_bet_request(Body),
         GameId = GameIdInt,
-        {BetId, GId, NewOdd1, NewOdd2, NewCapOpt1, NewCapOpt2, NewBalance, BetOdd, TotalVolume} = place_bet(UserId, GameId, Amount, Choice),
+        {BetId, GId, NewOdd1, NewOdd2, NewCapOpt1, NewCapOpt2, NewBalance, BetOdd, TotalVolume} = place_bet(UserId, GameId, Amount, Choice, ExpectedOdd),
         
         %% Broadcast odds update to all clients
         spawn(fun() -> 
@@ -65,6 +65,13 @@ handle_bet_placement(Req0, UserId, State) ->
             new_cap_opt2 => NewCapOpt2
         }), State}
     catch
+        throw:{odds_changed, CurrentOdd, ExpectedOdd} ->
+            {ok, reply_json(Req1, 409, #{
+                error => <<"Odds have changed">>,
+                current_odd => CurrentOdd,
+                expected_odd => ExpectedOdd,
+                message => <<"The odds have changed since you viewed them. Please review and try again.">>
+            }), State};
         throw:{amount_exceeds_cap, Cap} ->
             {ok, reply_json(Req1, 400, #{
                 error => <<"Amount exceeds cap">>,
@@ -81,19 +88,22 @@ handle_bet_placement(Req0, UserId, State) ->
     end.
 
 parse_bet_request(Body) ->
+    DecodedBody = jsx:decode(Body, [return_maps]),
     #{<<"game_id">> := GameId,
       <<"amount">> := Amount,
-      <<"choice">> := ChoiceBin} = jsx:decode(Body, [return_maps]),
+      <<"choice">> := ChoiceBin} = DecodedBody,
     
     Choice = case ChoiceBin of
         <<"opt1">> -> opt1;
         <<"opt2">> -> opt2
     end,
     
+    ExpectedOdd = maps:get(<<"expected_odd">>, DecodedBody, undefined),
+    
     true = Amount > 0,
-    {GameId, Amount, Choice}.
+    {GameId, Amount, Choice, ExpectedOdd}.
 
-place_bet(UserId, GameId, Amount, Choice) when Amount > 0 ->
+place_bet(UserId, GameId, Amount, Choice, ExpectedOdd) when Amount > 0 ->
     F = fun() ->
         [Game] = mnesia:read(game, GameId),
         true = Game#game.betting_open,
@@ -111,6 +121,17 @@ place_bet(UserId, GameId, Amount, Choice) when Amount > 0 ->
         {CurrentOdd, CurrentCap} = case Choice of
             opt1 -> {Odd1, CapOpt1};
             opt2 -> {Odd2, CapOpt2}
+        end,
+        
+        %% Validate expected odds if provided (with small tolerance for floating point comparison)
+        case ExpectedOdd of
+            undefined -> ok;  %% No validation if not provided
+            _ ->
+                OddDifference = abs(CurrentOdd - ExpectedOdd),
+                case OddDifference < 0.01 of  %% Tolerance of 0.01
+                    true -> ok;
+                    false -> throw({odds_changed, CurrentOdd, ExpectedOdd})
+                end
         end,
         
         Amount =< CurrentCap orelse throw({amount_exceeds_cap, CurrentCap}),

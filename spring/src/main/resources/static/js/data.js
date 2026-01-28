@@ -156,7 +156,7 @@ async function fetchGameDetail(gameId) {
     }
 }
 
-async function submitBetAPI(gameId, amount, choice) {
+async function submitBetAPI(gameId, amount, choice, expectedOdd) {
     try {
         const response = await fetch(`${API_BASE_URL}/bet`, {
             method: 'POST',
@@ -164,7 +164,8 @@ async function submitBetAPI(gameId, amount, choice) {
             body: JSON.stringify({
                 game_id: gameId,
                 amount: amount,
-                choice: choice
+                choice: choice,
+                expected_odd: expectedOdd
             })
         });
         
