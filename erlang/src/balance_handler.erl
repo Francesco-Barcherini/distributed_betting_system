@@ -56,11 +56,7 @@ handle_post(Req0, State) ->
                         NewBalance = add_balance(UserId, Amount),
                         
                         %% Broadcast balance update to user
-                        broadcast_dispatcher:send_to_user(UserId, #{
-                            opcode => <<"balance_update">>,
-                            user_id => UserId,
-                            balance => NewBalance
-                        }),
+                        broadcast_dispatcher:broadcast({balance_update, UserId, NewBalance}),
                         
                         Req2 = reply_json(Req1, 200, #{
                             user_id => UserId,
