@@ -24,6 +24,7 @@ public class SecurityConfig {
                                 "/dashboard.html",
                                 "/bet-detail.html",
                                 "/my-bets.html",
+                                "/add-balance.html",
                                 "/css/**",
                                 "/js/**",
                                 "/api/auth/**",
