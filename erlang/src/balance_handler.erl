@@ -50,8 +50,8 @@ handle_post(Req0, State) ->
                 %% Validate amount
                 if
                     Amount =< 0 ->
-                        Req = reply_json(Req1, 400, #{error => <<"Invalid amount">>}),
-                        {ok, Req, State};
+                        Req2 = reply_json(Req1, 400, #{error => <<"Invalid amount">>}),
+                        {ok, Req2, State};
                     true ->
                         NewBalance = add_balance(UserId, Amount),
                         
@@ -62,20 +62,18 @@ handle_post(Req0, State) ->
                             balance => NewBalance
                         }),
                         
-                        Resp = reply_json(Req1, 200, #{
+                        Req2 = reply_json(Req1, 200, #{
                             user_id => UserId,
                             amount_added => Amount,
                             new_balance => NewBalance
                         }),
-                        {ok, Resp, State}
+                        {ok, Req2, State}
                 end
             catch
                 error:badarg ->
-                    Req = reply_json(Req1, 400, #{error => <<"Invalid JSON">>}),
-                    {ok, Req, State};
+                    {ok, reply_json(Req1, 400, #{error => <<"Invalid JSON">>}), State};
                 error:_ ->
-                    Req = reply_json(Req1, 500, #{error => <<"Internal error">>}),
-                    {ok, Req, State}
+                    {ok, reply_json(Req1, 500, #{error => <<"Internal error">>}), State}
             end;
         {error, missing_token} ->
             Req = reply_json(Req0, 401, #{error => <<"Missing authorization token">>}),

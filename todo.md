@@ -28,8 +28,8 @@
   - [] Togliere nel websocket message di vincita il totale pagato e i vincitori
   - [] Chiusura scommesse sulla my bets
   - [] Refreshare solo quello che va refreshato quando arriva il websocket message
-  - [] Aggiungere POST /balance per aumentare il saldo
-  - [] Display bet amount input only after selecting an option
+  - [X] Aggiungere POST /balance per aumentare il saldo
+  - [X] Display bet amount input only after selecting an option
   - [] Redirect to login if JWT expired
   - [X] Disabilitare meglio le opzioni delle scommesse chiuse
 

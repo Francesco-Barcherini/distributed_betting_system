@@ -4,7 +4,6 @@
 
 -export([init/2]).
 
--record(account, {user_id, balance}).
 -record(game, {game_id, question_text, opt1_text, opt2_text, category, result, betting_open, tot_opt1, tot_opt2, created_at}).
 -record(bet, {bet_id, user_id, game_id, amount, choice, odd, placed_at}).
 
