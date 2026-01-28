@@ -6,7 +6,7 @@ let allGames = [];
 registerWSMessageHandler((data) => {
     // Handle odds updates, new games, etc.
     if (data.opcode === 'odds_update') {
-        updateGameOdds(data.game_id, data.odd1, data.odd2, data.cap_opt1, data.cap_opt2);
+        updateGameOdds(data.game_id, data.odd1, data.odd2, data.cap_opt1, data.cap_opt2, data.total_volume);
     } else if (data.opcode === 'new_game') {
         loadBets(); // Reload all games when a new one is created
     } else if (data.opcode === 'betting_closed' || data.opcode === 'game_result') {
@@ -21,13 +21,14 @@ registerWSMessageHandler((data) => {
 });
 
 // Update odds for a specific game in real-time
-function updateGameOdds(gameId, odd1, odd2, capOpt1, capOpt2) {
+function updateGameOdds(gameId, odd1, odd2, capOpt1, capOpt2, totalVolume) {
     const game = allGames.find(g => g.game_id === gameId);
     if (game) {
         game.odd1 = odd1;
         game.odd2 = odd2;
         game.cap_opt1 = capOpt1;
         game.cap_opt2 = capOpt2;
+        game.total_volume = totalVolume;
         loadBets(); // Refresh the display
     }
 }

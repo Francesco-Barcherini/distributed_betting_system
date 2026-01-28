@@ -18,6 +18,7 @@ registerWSMessageHandler((data) => {
         currentGame.odd2 = data.odd2;
         currentGame.cap_opt1 = data.cap_opt1;
         currentGame.cap_opt2 = data.cap_opt2;
+        currentGame.total_volume = data.total_volume;
         
         // Refresh the display
         displayGameDetails();

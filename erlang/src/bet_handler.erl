@@ -37,11 +37,11 @@ handle_bet_placement(Req0, UserId, State) ->
     try
         {GameIdInt, Amount, Choice} = parse_bet_request(Body),
         GameId = GameIdInt,
-        {BetId, GId, NewOdd1, NewOdd2, NewCapOpt1, NewCapOpt2, NewBalance, BetOdd} = place_bet(UserId, GameId, Amount, Choice),
+        {BetId, GId, NewOdd1, NewOdd2, NewCapOpt1, NewCapOpt2, NewBalance, BetOdd, TotalVolume} = place_bet(UserId, GameId, Amount, Choice),
         
         %% Broadcast odds update to all clients
         spawn(fun() -> 
-            broadcast_dispatcher:broadcast({update_odds, GId, NewOdd1, NewOdd2, NewCapOpt1, NewCapOpt2})
+            broadcast_dispatcher:broadcast({update_odds, GId, NewOdd1, NewOdd2, NewCapOpt1, NewCapOpt2, TotalVolume})
         end),
         
         %% Broadcast balance update to the specific user
@@ -152,8 +152,9 @@ place_bet(UserId, GameId, Amount, Choice) when Amount > 0 ->
         end,
         {NewOdd1, NewOdd2} = odds_calculator:calculate_odds(NewTotOpt1, NewTotOpt2, NewBets1, NewBets2),
         {NewCapOpt1, NewCapOpt2} = odds_calculator:calculate_caps(NewTotOpt1, NewTotOpt2, NewBets1, NewBets2),
+        TotalVolume = NewTotOpt1 + NewTotOpt2,
         
-        {BetId, GameId, NewOdd1, NewOdd2, NewCapOpt1, NewCapOpt2, NewBalance, CurrentOdd}
+        {BetId, GameId, NewOdd1, NewOdd2, NewCapOpt1, NewCapOpt2, NewBalance, CurrentOdd, TotalVolume}
     end,
     
     {atomic, Result} = mnesia:transaction(F),

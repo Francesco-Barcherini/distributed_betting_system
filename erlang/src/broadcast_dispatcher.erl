@@ -33,14 +33,15 @@ broadcast_admin(Msg) ->
 
 loop() ->
     receive 
-        {update_odds, GameId, Odd1, Odd2, CapOpt1, CapOpt2} ->
+        {update_odds, GameId, Odd1, Odd2, CapOpt1, CapOpt2, TotalVolume} ->
             broadcast_to_websockets(jsx:encode(#{
                 <<"opcode">> => <<"odds_update">>,
                 <<"game_id">> => GameId,
                 <<"odd1">> => Odd1,
                 <<"odd2">> => Odd2,
                 <<"cap_opt1">> => CapOpt1,
-                <<"cap_opt2">> => CapOpt2
+                <<"cap_opt2">> => CapOpt2,
+                <<"total_volume">> => TotalVolume
             }));
         
         {new_game, GameId, QuestionText, Opt1Text, Opt2Text, Category} ->

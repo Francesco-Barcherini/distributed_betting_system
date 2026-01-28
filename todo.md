@@ -22,7 +22,7 @@
   - [X] Data di bet da correggere (1970)
   - [X] Togliere alert e sostituire con modal
   - [X] Conto admin da mostrare
-  - [] Aggiornamento volume totale per ogni scommessa
+  - [X] Aggiornamento volume totale per ogni scommessa
   - [X] Togliere numero participants
   - [] Togliere console log generali
   - [] Togliere nel websocket message di vincita il totale pagato e i vincitori
@@ -33,6 +33,7 @@
   - [] Redirect to login if JWT expired
   - [X] Disabilitare meglio le opzioni delle scommesse chiuse
   - [X] CSS pulsanti filtri in mybets
+  - [] Extra safety: the frontend sends the expected odds along with the bet, so the backend can warn if they changed in the meantime and avoid placing bets with unexpected odds
 
 OPZIONALE 
   - [] separare websocket tra bet page e dashboard
