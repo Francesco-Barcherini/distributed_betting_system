@@ -88,7 +88,7 @@ function continueAsGuest() {
 // Check if already logged in
 document.addEventListener('DOMContentLoaded', () => {
     const currentUser = localStorage.getItem('currentUser');
-    if (currentUser) {
+    if (currentUser && !JSON.parse(currentUser).isGuest) {
         window.location.href = 'dashboard.html';
     }
 });
