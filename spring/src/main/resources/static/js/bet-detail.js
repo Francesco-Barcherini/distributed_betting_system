@@ -24,20 +24,12 @@ registerWSMessageHandler((data) => {
         
         // Deselect option since odds have changed
         if (selectedOutcome) {
-            selectedOutcome = null;
+            selectedOutcome = -1;
             frozenExpectedOdd = null;
             document.querySelectorAll('.outcome-btn').forEach(btn => {
                 btn.classList.remove('selected');
             });
-            
-            // Hide bet form inputs
-            // const betFormGroup = document.querySelector('.bet-form .form-group');
-            // const potentialReturnDiv = document.querySelector('.bet-form .potential-return');
-            // const placeBetBtn = document.querySelector('button[onclick="placeBet()"]');
-            // if (betFormGroup) betFormGroup.style.display = 'none';
-            // if (potentialReturnDiv) potentialReturnDiv.style.display = 'none';
-            // if (placeBetBtn) placeBetBtn.style.display = 'none';
-        }
+       }
         
         // Refresh the display
         displayGameDetails();
