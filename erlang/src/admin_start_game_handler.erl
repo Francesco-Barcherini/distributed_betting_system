@@ -32,7 +32,7 @@ handle_post(Req0, State) ->
         end,
 
         GameId = GameIdInt,
-        {WinnersCount, TotalPaid} = finish_game(GameId, Result),
+        {_WinnersCount, _TotalPaid} = finish_game(GameId, Result),
 
         Resp = reply_json(Req1, 200, #{
             message => <<"Game finished and payouts processed">>,

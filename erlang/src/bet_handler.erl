@@ -65,11 +65,11 @@ handle_bet_placement(Req0, UserId, State) ->
             new_cap_opt2 => NewCapOpt2
         }), State}
     catch
-        throw:{odds_changed, CurrentOdd, ExpectedOdd} ->
+        throw:{odds_changed, CurrentOdd, ExpectedOddValue} ->
             {ok, reply_json(Req1, 409, #{
                 error => <<"Odds have changed">>,
                 current_odd => CurrentOdd,
-                expected_odd => ExpectedOdd,
+                expected_odd => ExpectedOddValue,
                 message => <<"The odds have changed since you viewed them. Please review and try again.">>
             }), State};
         throw:{amount_exceeds_cap, Cap} ->

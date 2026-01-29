@@ -73,7 +73,7 @@ loop() ->
                 <<"game_id">> => GameId
             }));
         
-        {game_result, GameId, Result, WinnersCount, TotalPaid} ->
+        {game_result, GameId, Result, _WinnersCount, _TotalPaid} ->
             broadcast_to_websockets(jsx:encode(#{
                 <<"opcode">> => <<"game_result">>,
                 <<"game_id">> => GameId,
