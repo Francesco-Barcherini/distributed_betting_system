@@ -25,7 +25,7 @@ function connectWebSocket() {
         }
         pingInterval = setInterval(() => {
             if (ws && ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({ opcode: 'ping' }));
+                ws.send(JSON.stringify({ opcode: 'keepalive' }));
             }
         }, 30000); // 30 seconds
     };
