@@ -33,6 +33,9 @@ registerWSMessageHandler((data) => {
         
         // Refresh the display
         displayGameDetails();
+        
+        // Update potential return to show "-" if option was deselected
+        updatePotentialReturn();
     } else if (data.opcode === 'balance_update') {
         // Check if this balance update is related to the current virtual game being viewed
         const category = currentGame ? (currentGame.category || 'real') : 'real';
@@ -396,6 +399,14 @@ function updatePotentialReturn() {
     const amountInput = document.getElementById('bet-amount');
     const amount = parseFloat(amountInput.value) || 0;
     
+    // Handle deselected outcome (odds changed)
+    if (selectedOutcome === -1) {
+        document.getElementById('potential-return').textContent = '-';
+        const warningEl = document.getElementById('cap-warning');
+        if (warningEl) warningEl.remove();
+        return;
+    }
+    
     if (selectedOutcome && amount > 0 && currentGame) {
         const odds = selectedOutcome === 'opt1' ? currentGame.odd1 : currentGame.odd2;
         const cap = selectedOutcome === 'opt1' ? currentGame.cap_opt1 : currentGame.cap_opt2;
@@ -617,7 +628,7 @@ async function placeBet() {
         return;
     }
     
-    if (!selectedOutcome) {
+    if (!selectedOutcome || selectedOutcome === -1) {
         showErrorModal('Please select an outcome');
         return;
     }
