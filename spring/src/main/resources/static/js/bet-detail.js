@@ -647,13 +647,6 @@ async function placeBet() {
             displayGameDetails();
         }
         
-        // Reload user's bets for this game (skip for guests - though guests can't bet anyway)
-        const currentUserData = localStorage.getItem('currentUser');
-        const userData = currentUserData ? JSON.parse(currentUserData) : null;
-        if (userData && !userData.isGuest) {
-            loadMyBetsForGame(currentGame.game_id);
-        }
-        
         // Reset form
         document.getElementById('bet-amount').value = '';
         selectedOutcome = null;
