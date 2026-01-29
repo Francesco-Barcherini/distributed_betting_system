@@ -7,6 +7,7 @@ let wheelAngle = 0;
 let wheelSpinning = false;
 let wheelAnimationId = null;
 let userBalance = 0;
+let lastBalanceSeq = -1; // Track last applied balance sequence
 let pendingBalanceUpdate = null; // Store pending balance update during wheel spin
 
 // WebSocket message handler
@@ -29,12 +30,21 @@ registerWSMessageHandler((data) => {
                                       data.game_id === currentGame.game_id && 
                                       category === 'virtual';
         
+        // Only apply balance update if sequence number is higher (prevents race conditions)
+        if (data.balance_seq && data.balance_seq <= lastBalanceSeq) {
+            console.log(`Ignoring out-of-order balance update: ${data.balance_seq} <= ${lastBalanceSeq}`);
+            return;
+        }
+        
         if (isCurrentVirtualGame && wheelSpinning) {
             // Delay balance update until wheel stops spinning
-            pendingBalanceUpdate = data.balance;
+            pendingBalanceUpdate = {balance: data.balance, seq: data.balance_seq};
         } else {
             // Update balance immediately
             userBalance = data.balance;
+            if (data.balance_seq) {
+                lastBalanceSeq = data.balance_seq;
+            }
             updateBalanceDisplay();
         }
     } else if (data.opcode === 'bet_confirmed' && currentGame && data.game_id === currentGame.game_id) {
@@ -71,7 +81,10 @@ registerWSMessageHandler((data) => {
                 
                 // Apply pending balance update if there is one
                 if (pendingBalanceUpdate !== null) {
-                    userBalance = pendingBalanceUpdate;
+                    userBalance = pendingBalanceUpdate.balance;
+                    if (pendingBalanceUpdate.seq) {
+                        lastBalanceSeq = pendingBalanceUpdate.seq;
+                    }
                     updateBalanceDisplay();
                     pendingBalanceUpdate = null;
                 } else {

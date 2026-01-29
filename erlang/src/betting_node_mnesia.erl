@@ -1,6 +1,6 @@
 -module(betting_node_mnesia).
 
--export([init/0, wait_for_tables/0, next_game_id/0, next_bet_id/0]).
+-export([init/0, wait_for_tables/0, next_game_id/0, next_bet_id/0, next_balance_seq/0]).
 
 -record(account, {
     user_id,        % User ID from JWT
@@ -294,6 +294,10 @@ next_game_id() ->
 %% Get next bet ID
 next_bet_id() ->
     next_id(bet_id).
+
+%% Get next balance sequence number
+next_balance_seq() ->
+    next_id(balance_seq).
 
 %% Generic function to get next ID from counter
 next_id(CounterName) ->

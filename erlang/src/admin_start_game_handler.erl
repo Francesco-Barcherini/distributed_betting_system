@@ -81,9 +81,9 @@ finish_game(GameId, Result) ->
             spawn(fun() ->
                 ResultBin = result_to_binary(Result),
                 broadcast_dispatcher:broadcast({game_result, GameId, ResultBin, WinnersCount, TotalPaid}),
-                %% Send individual balance updates to winners with game_id
-                lists:foreach(fun({UserId, NewBalance}) ->
-                    broadcast_dispatcher:broadcast({balance_update, UserId, NewBalance, GameId})
+                %% Send individual balance updates to winners with game_id and balance_seq
+                lists:foreach(fun({UserId, NewBalance, BalanceSeq}) ->
+                    broadcast_dispatcher:broadcast({balance_update, UserId, NewBalance, GameId, BalanceSeq})
                 end, BalanceUpdates)
             end),
             {WinnersCount, TotalPaid};
@@ -107,7 +107,9 @@ pay_winners(WinningBets) ->
             [Account = #account{balance = Balance}] ->
                 NewBalance = Balance + Payout,
                 mnesia:write(Account#account{balance = NewBalance}),
-                {Count + 1, TotalPaid + Payout, [{UserId, NewBalance} | Updates]};
+                %% Generate balance sequence number
+                BalanceSeq = betting_node_mnesia:next_balance_seq(),
+                {Count + 1, TotalPaid + Payout, [{UserId, NewBalance, BalanceSeq} | Updates]};
             [] ->
                 {Count, TotalPaid, Updates}
         end

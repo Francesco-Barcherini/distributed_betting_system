@@ -1,6 +1,7 @@
 // State management
 let allBets = [];
 let currentFilter = 'all';
+let lastBalanceSeq = -1; // Track last applied balance sequence
 
 // WebSocket message handler
 registerWSMessageHandler((data) => {
@@ -8,10 +9,19 @@ registerWSMessageHandler((data) => {
     if (data.opcode === 'game_result' || data.opcode === 'bet_confirmed') {
         loadMyBets();
     } else if (data.opcode === 'balance_update') {
+        // Only apply balance update if sequence number is higher (prevents race conditions)
+        if (data.balance_seq && data.balance_seq <= lastBalanceSeq) {
+            console.log(`Ignoring out-of-order balance update: ${data.balance_seq} <= ${lastBalanceSeq}`);
+            return;
+        }
+        
         // Update user balance in real-time
         const balanceElement = document.querySelector('.balance-amount');
         if (balanceElement && data.balance != null) {
             balanceElement.textContent = `$${data.balance.toFixed(2)}`;
+            if (data.balance_seq) {
+                lastBalanceSeq = data.balance_seq;
+            }
         }
     }
 });

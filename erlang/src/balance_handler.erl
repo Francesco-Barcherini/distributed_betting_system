@@ -53,10 +53,10 @@ handle_post(Req0, State) ->
                         Req2 = reply_json(Req1, 400, #{error => <<"Invalid amount">>}),
                         {ok, Req2, State};
                     true ->
-                        NewBalance = add_balance(UserId, Amount),
+                        {NewBalance, BalanceSeq} = add_balance(UserId, Amount),
                         
-                        %% Broadcast balance update to user
-                        broadcast_dispatcher:broadcast({balance_update, UserId, NewBalance}),
+                        %% Broadcast balance update to user with sequence number
+                        broadcast_dispatcher:broadcast({balance_update, UserId, NewBalance, BalanceSeq}),
                         
                         Req2 = reply_json(Req1, 200, #{
                             user_id => UserId,
@@ -103,16 +103,20 @@ add_balance(UserId, Amount) ->
                 NewBalance = CurrentBalance + Amount,
                 UpdatedAccount = Account#account{balance = NewBalance},
                 mnesia:write(UpdatedAccount),
-                NewBalance;
+                %% Generate balance sequence number
+                BalanceSeq = betting_node_mnesia:next_balance_seq(),
+                {NewBalance, BalanceSeq};
             [] ->
                 %% Account doesn't exist, create with amount
                 NewAccount = #account{user_id = UserId, balance = Amount},
                 mnesia:write(NewAccount),
-                Amount
+                %% Generate balance sequence number
+                BalanceSeq = betting_node_mnesia:next_balance_seq(),
+                {Amount, BalanceSeq}
         end
     end,
-    {atomic, NewBalance} = mnesia:transaction(F),
-    NewBalance.
+    {atomic, Result} = mnesia:transaction(F),
+    Result.
 
 reply_json(Req, Status, Body) ->
     NodeName = list_to_binary(atom_to_list(node())),

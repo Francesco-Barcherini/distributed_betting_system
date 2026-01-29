@@ -80,21 +80,23 @@ loop() ->
                 <<"result">> => Result
             }));
         
-        {balance_update, UserId, NewBalance} ->
+        {balance_update, UserId, NewBalance, BalanceSeq} ->
             %% Send balance update only to the specific user's WebSocket
             broadcast_to_user(UserId, jsx:encode(#{
                 <<"opcode">> => <<"balance_update">>,
                 <<"user_id">> => UserId,
-                <<"balance">> => NewBalance
+                <<"balance">> => NewBalance,
+                <<"balance_seq">> => BalanceSeq
             }));
         
-        {balance_update, UserId, NewBalance, GameId} ->
+        {balance_update, UserId, NewBalance, GameId, BalanceSeq} ->
             %% Send balance update with game_id (for game result payouts)
             broadcast_to_user(UserId, jsx:encode(#{
                 <<"opcode">> => <<"balance_update">>,
                 <<"user_id">> => UserId,
                 <<"balance">> => NewBalance,
-                <<"game_id">> => GameId
+                <<"game_id">> => GameId,
+                <<"balance_seq">> => BalanceSeq
             }));
         
         {bet_placed, UserId, GameId, Amount, Choice, Odd} ->

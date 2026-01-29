@@ -34,7 +34,7 @@
   - [X] Disabilitare meglio le opzioni delle scommesse chiuse
   - [X] CSS pulsanti filtri in mybets
   - [X] Extra safety: the frontend sends the expected odds along with the bet, so the backend can warn if they changed in the meantime and avoid placing bets with unexpected odds
-  - [] Race condition in balance update
+  - [X] Race condition in balance update
 
 OPZIONALE 
   - [] separare websocket tra bet page e dashboard

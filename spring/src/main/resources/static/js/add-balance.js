@@ -1,10 +1,22 @@
+// State management
+let lastBalanceSeq = -1; // Track last applied balance sequence
+
 // WebSocket message handler
 registerWSMessageHandler((data) => {
     // Update balance when receiving balance_update message
     if (data.opcode === 'balance_update') {
+        // Only apply balance update if sequence number is higher (prevents race conditions)
+        if (data.balance_seq && data.balance_seq <= lastBalanceSeq) {
+            console.log(`Ignoring out-of-order balance update: ${data.balance_seq} <= ${lastBalanceSeq}`);
+            return;
+        }
+        
         const balanceElement = document.querySelector('.balance-amount');
         if (balanceElement && data.balance != null) {
             balanceElement.textContent = `$${data.balance.toFixed(2)}`;
+            if (data.balance_seq) {
+                lastBalanceSeq = data.balance_seq;
+            }
         }
     }
 });
