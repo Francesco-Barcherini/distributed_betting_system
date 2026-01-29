@@ -181,8 +181,14 @@ place_bet(UserId, GameId, Amount, Choice, ExpectedOdd) when Amount > 0 ->
         {BetId, GameId, NewOdd1, NewOdd2, NewCapOpt1, NewCapOpt2, NewBalance, CurrentOdd, TotalVolume, BalanceSeq}
     end,
     
-    {atomic, Result} = mnesia:transaction(F),
-    Result.
+    case mnesia:transaction(F) of
+        {atomic, Result} -> 
+            Result;
+        {aborted, {throw, Reason}} ->
+            throw(Reason);
+        {aborted, Reason} ->
+            erlang:error(Reason)
+    end.
 
 reply_json(Req, Status, Body) ->
     NodeName = list_to_binary(atom_to_list(node())),
